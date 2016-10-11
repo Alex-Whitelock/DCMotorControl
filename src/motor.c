@@ -26,6 +26,9 @@ void motor_init(void) {
 void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 
+	target_rpm = 0;
+	delay_ms(500);
+
 	motor_ticks = 0;// intitialize the motor ticks to 0.
 
 	dir = _dir;//set the global direction to the new one.
@@ -45,7 +48,7 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 	}
 
-	int16_t half_encoder_ticks = encoder_ticks>>1; //get half of the encoder ticks.
+	int16_t half_encoder_ticks = encoder_ticks/2; //get half of the encoder ticks.
 	halved_ticks = 0;
 
 
@@ -54,15 +57,16 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 		if(dir == 0){
 			if(halved_ticks >= half_encoder_ticks){
-				if(target_rpm > 50){
-					halved_ticks = 0;
-					half_encoder_ticks = half_encoder_ticks >>1; //reduces the new half way point by 2.
-					target_rpm = target_rpm - 10; //reduce the target rpm by half
-				}
-			else{
-						halved_ticks = 0;
-						target_rpm = 30;
-				}
+				target_rpm = 60;
+//				if(target_rpm > 50){
+//					halved_ticks = 0;
+//					half_encoder_ticks = half_encoder_ticks >> 1; //reduces the new half way point by 2.
+//					target_rpm = target_rpm ; //reduce the target rpm by half
+//				}
+//			else{
+//						halved_ticks = 0;
+//						target_rpm = 30;
+//				}
 			}
 
 			if(motor_ticks >= (encoder_ticks)){
@@ -76,10 +80,50 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 		}
 	}
+	target_rpm = 0;
+	delay_ms(1000);//wait a second.
+
+
+		if(dir == 0){
+				dir = 1;
+				GPIOC->ODR &= ~(1 << 4);  // Set PA4 to low
+				delay_ms(1);
+				GPIOC->ODR |= (1 << 5);
+				target_rpm = 20;
+
+			}
+			else{
+				dir = 0;
+				//Set PA4 to high
+				GPIOC->ODR |= (1 << 4);
+				delay_ms(1);
+				GPIOC->ODR &= ~(1 << 5);
+				// Set PA5 to low
+				target_rpm = 20;
+			}
+
+		overshot = 0;
+		while(overshot != 1){
+			if(dir == 1){
+				if(motor_ticks <= (encoder_ticks)){
+						overshot = 1;
+					}
+			}
+			else{
+
+				if((~(motor_ticks)+1) <= encoder_ticks){
+								overshot = 1;
+				}
+			}
+
+		}
+
+
 
 	motor_ticks = 0;
-
 	target_rpm = 0;
+
+
 
 
 
@@ -258,14 +302,11 @@ void PI_update(void) {
 		error = (2*target_rpm)+motor_speed;
 	}
 
-	if(dir==0){
-		motor_ticks = motor_ticks + motor_speed;//Do this to keep track of the total ticks.
-		halved_ticks = motor_ticks + halved_ticks;
+	    //Do this to keep track of the total ticks.
+		motor_ticks = motor_ticks + motor_speed;
+		halved_ticks = halved_ticks + motor_speed;
 
-	}else{
-		motor_ticks = motor_ticks + motor_speed; //Calculate the total ticks going the other way.
-		halved_ticks = motor_ticks + halved_ticks;
-	}
+
 
 
     /* Hint: Remember that your calculated motor speed may not be directly in RPM!

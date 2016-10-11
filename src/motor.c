@@ -45,10 +45,26 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 	}
 
+	int16_t half_encoder_ticks = encoder_ticks>>1; //get half of the encoder ticks.
+	halved_ticks = 0;
+
+
 	overshot = 0;
 	while(!overshot){
 
 		if(dir == 0){
+			if(halved_ticks >= half_encoder_ticks){
+				if(target_rpm > 50){
+					halved_ticks = 0;
+					half_encoder_ticks = half_encoder_ticks >>1; //reduces the new half way point by 2.
+					target_rpm = target_rpm - 10; //reduce the target rpm by half
+				}
+			else{
+						halved_ticks = 0;
+						target_rpm = 30;
+				}
+			}
+
 			if(motor_ticks >= (encoder_ticks)){
 				overshot = 1;
 			}
@@ -242,11 +258,14 @@ void PI_update(void) {
 		error = (2*target_rpm)+motor_speed;
 	}
 
-	if(dir==0)
+	if(dir==0){
 		motor_ticks = motor_ticks + motor_speed;//Do this to keep track of the total ticks.
-	else
-		motor_ticks = motor_ticks + motor_speed; //Calculate the total ticks going the other way.
+		halved_ticks = motor_ticks + halved_ticks;
 
+	}else{
+		motor_ticks = motor_ticks + motor_speed; //Calculate the total ticks going the other way.
+		halved_ticks = motor_ticks + halved_ticks;
+	}
 
 
     /* Hint: Remember that your calculated motor speed may not be directly in RPM!

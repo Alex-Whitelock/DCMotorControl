@@ -24,6 +24,7 @@ volatile int16_t target_rpm;    // Desired speed target
 volatile int16_t motor_speed;   // Measured motor speed
 volatile int8_t adc_value;      // ADC measured motor current
 volatile int16_t error;         // Speed error signal
+static int16_t max_rpm = 200;
 
 
 
@@ -38,6 +39,8 @@ volatile int16_t halved_ticks; //This is a havled ticks value to know when to de
  *  Motor Control and Initialization Functions
  * -------------------------------------------------------------------------------------------------------------
  */
+
+void set_initial_target_rpm(int16_t);
 
 // Sets up the entire motor drive system
 void motor_init(void);

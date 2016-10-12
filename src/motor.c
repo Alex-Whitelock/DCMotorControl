@@ -38,15 +38,14 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 	if(dir == 0){
 		GPIOC->ODR |= (1 << 4);  // Set PA4 to high
 		GPIOC->ODR &= ~(1 << 5); // Set PA5 to low
-		target_rpm = 120;// probably going to want to make this 180 later.
 
 	}
 	else{
 		GPIOC->ODR &= ~(1 << 4);  // Set PA4 to low
 		GPIOC->ODR |= (1 << 5); // Set PA5 to high
-		target_rpm = 120;// probably going to want to make this 180 later.
-
 	}
+
+	set_initial_target_rpm(encoder_ticks);
 
 	int16_t half_encoder_ticks = encoder_ticks/2; //get half of the encoder ticks.
 	halved_ticks = 0;
@@ -57,16 +56,16 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 		if(dir == 0){
 			if(halved_ticks >= half_encoder_ticks){
-			//	if(target_rpm > 50){
+				if(target_rpm > 30){
 					halved_ticks = 0;
 					half_encoder_ticks = half_encoder_ticks >> 1; //reduces the new half way point by 2.
 					target_rpm = target_rpm/2 ; //reduce the target rpm by half
-			//	}
-		//	else{
+				}
+			else{
 
-					//	halved_ticks = 0;
-					//	target_rpm = 30;
-				//}
+						halved_ticks = 0;
+						target_rpm = 20;
+				}
 			}
 
 			if(motor_ticks >= (encoder_ticks)){
@@ -74,6 +73,20 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 			}
 		}
 		else{
+
+				if((~(halved_ticks)+1) >= half_encoder_ticks){
+
+					if(target_rpm > 30){
+						halved_ticks = 0;
+						half_encoder_ticks = half_encoder_ticks /2 ;
+						target_rpm = target_rpm >> 1 ;
+					}
+					else{
+						halved_ticks = 0;
+						target_rpm = 20;
+					}
+				}
+
 			if((~(motor_ticks)+1) >= encoder_ticks){
 				overshot = 1;
 			}
@@ -125,9 +138,21 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 	target_rpm = 0;
 	apply_electronic_break();
 
+}
 
-
-
+void set_initial_target_rpm(int16_t encoder_ticks){
+	if(encoder_ticks > 4800){
+		target_rpm = max_rpm;
+	}
+	else if(encoder_ticks <= 4799 && encoder_ticks>3200){
+		target_rpm = max_rpm/2;
+	}
+	else if(encoder_ticks <= 3200 && encoder_ticks >1600){
+		target_rpm = max_rpm/4;
+	}
+	else{
+		target_rpm = 20;
+	}
 
 
 }

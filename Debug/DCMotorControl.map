@@ -15,6 +15,7 @@ Common symbol       size              file
 motor_speed         0x2               ./src/main.o
 errno               0x4               ./system/src/newlib/_syscalls.o
 target_rpm          0x2               ./src/main.o
+halved_ticks        0x2               ./src/main.o
 debouncer           0x4               ./src/main.o
 SysTick_callback    0x4               ./src/delay.o
 adc_value           0x1               ./src/main.o
@@ -1432,7 +1433,7 @@ END GROUP
                 0x20001c00                __Main_Stack_Limit = (__stack - __Main_Stack_Size)
                 [!provide]                PROVIDE (_Main_Stack_Limit, __Main_Stack_Limit)
                 0x00000100                _Minimum_Stack_Size = 0x100
-                0x20000054                PROVIDE (_Heap_Begin, _end_noinit)
+                0x20000058                PROVIDE (_Heap_Begin, _end_noinit)
                 0x20001c00                PROVIDE (_Heap_Limit, (__stack - __Main_Stack_Size))
 
 .isr_vector     0x08000000      0x218
@@ -1498,16 +1499,16 @@ END GROUP
 
 .inits          0x08000218       0x28
                 0x08000218                __data_regions_array_start = .
-                0x08000218        0x4 LONG 0x8000ad0 LOADADDR (.data)
+                0x08000218        0x4 LONG 0x8000c84 LOADADDR (.data)
                 0x0800021c        0x4 LONG 0x20000000 ADDR (.data)
                 0x08000220        0x4 LONG 0x20000028 (ADDR (.data) + SIZEOF (.data))
-                0x08000224        0x4 LONG 0x8000ad0 LOADADDR (.data_CCMRAM)
+                0x08000224        0x4 LONG 0x8000c84 LOADADDR (.data_CCMRAM)
                 0x08000228        0x4 LONG 0x0 ADDR (.data_CCMRAM)
                 0x0800022c        0x4 LONG 0x0 (ADDR (.data_CCMRAM) + SIZEOF (.data_CCMRAM))
                 0x08000230                __data_regions_array_end = .
                 0x08000230                __bss_regions_array_start = .
                 0x08000230        0x4 LONG 0x20000028 ADDR (.bss)
-                0x08000234        0x4 LONG 0x20000054 (ADDR (.bss) + SIZEOF (.bss))
+                0x08000234        0x4 LONG 0x20000058 (ADDR (.bss) + SIZEOF (.bss))
                 0x08000238        0x4 LONG 0x0 ADDR (.bss_CCMRAM)
                 0x0800023c        0x4 LONG 0x0 (ADDR (.bss_CCMRAM) + SIZEOF (.bss_CCMRAM))
                 0x08000240                __bss_regions_array_end = .
@@ -1533,7 +1534,7 @@ END GROUP
 .flashtext
  *(.flashtext .flashtext.*)
 
-.text           0x08000240      0x890
+.text           0x08000240      0xa44
  *(.text .text.*)
  .text._exit    0x08000240        0x4 ./system/src/newlib/_exit.o
                 0x08000240                _exit
@@ -1577,76 +1578,82 @@ END GROUP
                 0x0800052c                button_init
  .text.main     0x08000560       0x6c ./src/main.o
                 0x08000560                main
+ .text.set_initial_target_rpm
+                0x080005cc       0x58 ./src/motor.o
+                0x080005cc                set_initial_target_rpm
+ .text.apply_electronic_break
+                0x08000624       0x1c ./src/motor.o
+                0x08000624                apply_electronic_break
  .text.move_motor
-                0x080005cc       0xa4 ./src/motor.o
-                0x080005cc                move_motor
+                0x08000640      0x1ec ./src/motor.o
+                0x08000640                move_motor
  .text.pwm_init
-                0x08000670       0xa0 ./src/motor.o
-                0x08000670                pwm_init
+                0x0800082c       0xa0 ./src/motor.o
+                0x0800082c                pwm_init
  .text.pwm_setDutyCycle
-                0x08000710       0x1c ./src/motor.o
-                0x08000710                pwm_setDutyCycle
+                0x080008cc       0x1c ./src/motor.o
+                0x080008cc                pwm_setDutyCycle
  .text.encoder_init
-                0x0800072c       0xbc ./src/motor.o
-                0x0800072c                encoder_init
+                0x080008e8       0xbc ./src/motor.o
+                0x080008e8                encoder_init
  .text.ADC_init
-                0x080007e8       0x80 ./src/motor.o
-                0x080007e8                ADC_init
+                0x080009a4       0x80 ./src/motor.o
+                0x080009a4                ADC_init
  .text.motor_init
-                0x08000868       0x10 ./src/motor.o
-                0x08000868                motor_init
+                0x08000a24       0x10 ./src/motor.o
+                0x08000a24                motor_init
  .text.PI_update
-                0x08000878      0x104 ./src/motor.o
-                0x08000878                PI_update
+                0x08000a34       0xfc ./src/motor.o
+                0x08000a34                PI_update
  .text.TIM6_DAC_IRQHandler
-                0x0800097c       0x3c ./src/motor.o
-                0x0800097c                TIM6_DAC_IRQHandler
- .text          0x080009b8      0x114 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_udivsi3.o)
-                0x080009b8                __aeabi_uidiv
-                0x080009b8                __udivsi3
-                0x08000ac4                __aeabi_uidivmod
- .text          0x08000acc        0x4 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_dvmd_tls.o)
-                0x08000acc                __aeabi_idiv0
-                0x08000acc                __aeabi_ldiv0
+                0x08000b30       0x3c ./src/motor.o
+                0x08000b30                TIM6_DAC_IRQHandler
+ .text          0x08000b6c      0x114 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_udivsi3.o)
+                0x08000b6c                __aeabi_uidiv
+                0x08000b6c                __udivsi3
+                0x08000c78                __aeabi_uidivmod
+ .text          0x08000c80        0x4 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_dvmd_tls.o)
+                0x08000c80                __aeabi_idiv0
+                0x08000c80                __aeabi_ldiv0
  *(.rodata .rodata.* .constdata .constdata.*)
  *(vtable)
  *(.eh_frame*)
  *(.glue_7)
- .glue_7        0x08000ad0        0x0 linker stubs
+ .glue_7        0x08000c84        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x08000ad0        0x0 linker stubs
+ .glue_7t       0x08000c84        0x0 linker stubs
 
-.vfp11_veneer   0x08000ad0        0x0
- .vfp11_veneer  0x08000ad0        0x0 linker stubs
+.vfp11_veneer   0x08000c84        0x0
+ .vfp11_veneer  0x08000c84        0x0 linker stubs
 
-.v4_bx          0x08000ad0        0x0
- .v4_bx         0x08000ad0        0x0 linker stubs
+.v4_bx          0x08000c84        0x0
+ .v4_bx         0x08000c84        0x0 linker stubs
 
-.iplt           0x08000ad0        0x0
- .iplt          0x08000ad0        0x0 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o
+.iplt           0x08000c84        0x0
+ .iplt          0x08000c84        0x0 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o
 
-.rel.dyn        0x08000ad0        0x0
- .rel.iplt      0x08000ad0        0x0 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o
+.rel.dyn        0x08000c84        0x0
+ .rel.iplt      0x08000c84        0x0 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x08000ad0                . = ALIGN (0x4)
-                0x08000ad0                __exidx_start = .
+                0x08000c84                . = ALIGN (0x4)
+                0x08000c84                __exidx_start = .
 
 .ARM.exidx
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-                0x08000ad0                __exidx_end = .
-                0x08000ad0                . = ALIGN (0x4)
-                0x08000ad0                _etext = .
-                0x08000ad0                __etext = .
+                0x08000c84                __exidx_end = .
+                0x08000c84                . = ALIGN (0x4)
+                0x08000c84                _etext = .
+                0x08000c84                __etext = .
 
-.data_CCMRAM    0x00000000        0x0 load address 0x08000ad0
+.data_CCMRAM    0x00000000        0x0 load address 0x08000c84
  FILL mask 0xff
  *(.data.CCMRAM .data.CCMRAM.*)
                 0x00000000                . = ALIGN (0x4)
-                0x08000ad0                _sidata = LOADADDR (.data)
+                0x08000c84                _sidata = LOADADDR (.data)
 
-.data           0x20000000       0x28 load address 0x08000ad0
+.data           0x20000000       0x28 load address 0x08000c84
  FILL mask 0xff
                 0x20000000                _sdata = .
                 0x20000000                __data_start__ = .
@@ -1672,13 +1679,13 @@ END GROUP
                 0x20000028                _edata = .
                 0x20000028                __data_end__ = .
 
-.igot.plt       0x20000028        0x0 load address 0x08000af8
+.igot.plt       0x20000028        0x0 load address 0x08000cac
  .igot.plt      0x20000028        0x0 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o
 
 .bss_CCMRAM     0x00000000        0x0
  *(.bss.CCMRAM .bss.CCMRAM.*)
 
-.bss            0x20000028       0x2c
+.bss            0x20000028       0x30
                 0x20000028                __bss_start__ = .
                 0x20000028                _sbss = .
  *(.bss_begin .bss_begin.*)
@@ -1694,40 +1701,41 @@ END GROUP
  COMMON         0x20000034        0x8 ./src/delay.o
                 0x20000034                SysTick_callback
                 0x20000038                delay_tics
- COMMON         0x2000003c       0x13 ./src/main.o
+ COMMON         0x2000003c       0x17 ./src/main.o
                 0x2000003c                motor_speed
                 0x2000003e                target_rpm
-                0x20000040                debouncer
-                0x20000044                adc_value
-                0x20000046                error_integral
-                0x20000048                overshot
-                0x20000049                dir
-                0x2000004a                error
-                0x2000004c                motor_ticks
-                0x2000004e                duty_cycle
+                0x20000040                halved_ticks
+                0x20000044                debouncer
+                0x20000048                adc_value
+                0x2000004a                error_integral
+                0x2000004c                overshot
+                0x2000004d                dir
+                0x2000004e                error
+                0x20000050                motor_ticks
+                0x20000052                duty_cycle
  *(.bss_end .bss_end.*)
- *fill*         0x2000004f        0x1 
- .bss_end       0x20000050        0x4 ./system/src/newlib/_startup.o
-                0x20000054                . = ALIGN (0x4)
-                0x20000054                __bss_end__ = .
-                0x20000054                _ebss = .
+ *fill*         0x20000053        0x1 
+ .bss_end       0x20000054        0x4 ./system/src/newlib/_startup.o
+                0x20000058                . = ALIGN (0x4)
+                0x20000058                __bss_end__ = .
+                0x20000058                _ebss = .
 
 .noinit_CCMRAM
  *(.noinit.CCMRAM .noinit.CCMRAM.*)
 
-.noinit         0x20000054        0x0
-                0x20000054                _noinit = .
+.noinit         0x20000058        0x0
+                0x20000058                _noinit = .
  *(.noinit .noinit.*)
-                0x20000054                . = ALIGN (0x4)
-                0x20000054                _end_noinit = .
+                0x20000058                . = ALIGN (0x4)
+                0x20000058                _end_noinit = .
                 [!provide]                PROVIDE (end, _end_noinit)
                 [!provide]                PROVIDE (_end, _end_noinit)
                 [!provide]                PROVIDE (__end, _end_noinit)
                 [!provide]                PROVIDE (__end__, _end_noinit)
 
-._check_stack   0x20000054      0x100
-                0x20000154                . = (. + _Minimum_Stack_Size)
- *fill*         0x20000054      0x100 
+._check_stack   0x20000058      0x100
+                0x20000158                . = (. + _Minimum_Stack_Size)
+ *fill*         0x20000058      0x100 
 
 .b1text
  *(.b1text)
@@ -1825,7 +1833,7 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x230
+.debug_aranges  0x00000000      0x240
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x28 ./system/src/newlib/_exit.o
@@ -1846,12 +1854,12 @@ END GROUP
  .debug_aranges
                 0x000001a0       0x38 ./src/main.o
  .debug_aranges
-                0x000001d8       0x58 ./src/motor.o
+                0x000001d8       0x68 ./src/motor.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x225c
+.debug_info     0x00000000     0x2368
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000       0xee ./system/src/newlib/_exit.o
  .debug_info    0x000000ee      0x454 ./system/src/newlib/_startup.o
@@ -1861,10 +1869,10 @@ END GROUP
  .debug_info    0x0000098d      0x2ec ./system/src/cmsis/system_stm32f0xx.o
  .debug_info    0x00000c79       0xd1 ./system/src/cmsis/vectors_stm32f0xx.o
  .debug_info    0x00000d4a      0x4ea ./src/delay.o
- .debug_info    0x00001234      0x634 ./src/main.o
- .debug_info    0x00001868      0x9f4 ./src/motor.o
+ .debug_info    0x00001234      0x651 ./src/main.o
+ .debug_info    0x00001885      0xae3 ./src/motor.o
 
-.debug_abbrev   0x00000000      0xbe0
+.debug_abbrev   0x00000000      0xc4e
  *(.debug_abbrev)
  .debug_abbrev  0x00000000       0xbd ./system/src/newlib/_exit.o
  .debug_abbrev  0x000000bd      0x1ac ./system/src/newlib/_startup.o
@@ -1874,10 +1882,10 @@ END GROUP
  .debug_abbrev  0x000004b8      0x148 ./system/src/cmsis/system_stm32f0xx.o
  .debug_abbrev  0x00000600       0x9d ./system/src/cmsis/vectors_stm32f0xx.o
  .debug_abbrev  0x0000069d      0x20c ./src/delay.o
- .debug_abbrev  0x000008a9      0x143 ./src/main.o
- .debug_abbrev  0x000009ec      0x1f4 ./src/motor.o
+ .debug_abbrev  0x000008a9      0x152 ./src/main.o
+ .debug_abbrev  0x000009fb      0x253 ./src/motor.o
 
-.debug_line     0x00000000     0x2afa
+.debug_line     0x00000000     0x2b50
  *(.debug_line)
  .debug_line    0x00000000      0x30d ./system/src/newlib/_exit.o
  .debug_line    0x0000030d      0x376 ./system/src/newlib/_startup.o
@@ -1888,9 +1896,9 @@ END GROUP
  .debug_line    0x000017b0      0x103 ./system/src/cmsis/vectors_stm32f0xx.o
  .debug_line    0x000018b3      0x56a ./src/delay.o
  .debug_line    0x00001e1d      0x614 ./src/main.o
- .debug_line    0x00002431      0x6c9 ./src/motor.o
+ .debug_line    0x00002431      0x71f ./src/motor.o
 
-.debug_frame    0x00000000      0x3f4
+.debug_frame    0x00000000      0x420
  *(.debug_frame)
  .debug_frame   0x00000000       0x38 ./system/src/newlib/_exit.o
  .debug_frame   0x00000038       0x80 ./system/src/newlib/_startup.o
@@ -1901,10 +1909,10 @@ END GROUP
  .debug_frame   0x00000224       0x20 ./system/src/cmsis/vectors_stm32f0xx.o
  .debug_frame   0x00000244       0x70 ./src/delay.o
  .debug_frame   0x000002b4       0x58 ./src/main.o
- .debug_frame   0x0000030c       0xc8 ./src/motor.o
- .debug_frame   0x000003d4       0x20 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_udivsi3.o)
+ .debug_frame   0x0000030c       0xf4 ./src/motor.o
+ .debug_frame   0x00000400       0x20 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_udivsi3.o)
 
-.debug_str      0x00000000    0x4575a
+.debug_str      0x00000000    0x45797
  *(.debug_str)
  .debug_str     0x00000000     0x66e0 ./system/src/newlib/_exit.o
                                0x684a (size before relaxing)
@@ -1922,19 +1930,19 @@ END GROUP
                                0x2ee0 (size before relaxing)
  .debug_str     0x000449d5      0x307 ./src/delay.o
                               0x41f8c (size before relaxing)
- .debug_str     0x00044cdc      0x9d5 ./src/main.o
-                              0x43e9e (size before relaxing)
- .debug_str     0x000456b1       0xa9 ./src/motor.o
-                              0x440e3 (size before relaxing)
+ .debug_str     0x00044cdc      0x9df ./src/main.o
+                              0x43eb3 (size before relaxing)
+ .debug_str     0x000456bb       0xdc ./src/motor.o
+                              0x44142 (size before relaxing)
 
-.debug_loc      0x00000000      0x52c
+.debug_loc      0x00000000      0x5a5
  *(.debug_loc)
  .debug_loc     0x00000000      0x265 ./system/src/newlib/_startup.o
  .debug_loc     0x00000265       0x63 ./system/src/newlib/_syscalls.o
  .debug_loc     0x000002c8       0xee ./system/src/cmsis/system_stm32f0xx.o
  .debug_loc     0x000003b6       0x82 ./src/delay.o
  .debug_loc     0x00000438       0x42 ./src/main.o
- .debug_loc     0x0000047a       0xb2 ./src/motor.o
+ .debug_loc     0x0000047a      0x12b ./src/motor.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -1952,7 +1960,7 @@ END GROUP
  *(.debug_varnames)
 OUTPUT(DCMotorControl.elf elf32-littlearm)
 
-.debug_ranges   0x00000000      0x1a8
+.debug_ranges   0x00000000      0x1b8
  .debug_ranges  0x00000000       0x18 ./system/src/newlib/_exit.o
  .debug_ranges  0x00000018       0x48 ./system/src/newlib/_startup.o
  .debug_ranges  0x00000060       0x20 ./system/src/newlib/_syscalls.o
@@ -1962,7 +1970,7 @@ OUTPUT(DCMotorControl.elf elf32-littlearm)
  .debug_ranges  0x000000f8       0x10 ./system/src/cmsis/vectors_stm32f0xx.o
  .debug_ranges  0x00000108       0x30 ./src/delay.o
  .debug_ranges  0x00000138       0x28 ./src/main.o
- .debug_ranges  0x00000160       0x48 ./src/motor.o
+ .debug_ranges  0x00000160       0x58 ./src/motor.o
 
 .debug_macro    0x00000000     0x22be
  .debug_macro   0x00000000      0x172 ./system/src/newlib/_exit.o

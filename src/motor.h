@@ -24,12 +24,14 @@ volatile int16_t target_rpm;    // Desired speed target
 volatile int16_t motor_speed;   // Measured motor speed
 volatile int8_t adc_value;      // ADC measured motor current
 volatile int16_t error;         // Speed error signal
+static int16_t max_rpm = 200;
 
 
 
 volatile int8_t overshot;
 volatile int8_t dir;
 volatile int16_t motor_ticks;
+volatile int16_t halved_ticks; //This is a havled ticks value to know when to decrease the value of the encoder ticks.
             // Integral gain
 
 
@@ -37,6 +39,8 @@ volatile int16_t motor_ticks;
  *  Motor Control and Initialization Functions
  * -------------------------------------------------------------------------------------------------------------
  */
+
+void set_initial_target_rpm(int16_t);
 
 // Sets up the entire motor drive system
 void motor_init(void);
@@ -55,6 +59,9 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir);
  *  Internal-Use Initialization Functions
  * -------------------------------------------------------------------------------------------------------------
  */
+
+//Applys the electronic break for whichever direction the motor is currently in.
+void apply_electronic_break(void);
 
 // Sets up the PWM and direction signals to drive the H-Bridge
 void pwm_init(void);

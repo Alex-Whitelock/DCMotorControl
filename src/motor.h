@@ -57,6 +57,9 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir);
  * -------------------------------------------------------------------------------------------------------------
  */
 
+//Applys the electronic break for whichever direction the motor is currently in.
+void apply_electronic_break(void);
+
 // Sets up the PWM and direction signals to drive the H-Bridge
 void pwm_init(void);
 

@@ -57,16 +57,16 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 		if(dir == 0){
 			if(halved_ticks >= half_encoder_ticks){
-				target_rpm = 60;
-//				if(target_rpm > 50){
-//					halved_ticks = 0;
-//					half_encoder_ticks = half_encoder_ticks >> 1; //reduces the new half way point by 2.
-//					target_rpm = target_rpm ; //reduce the target rpm by half
-//				}
-//			else{
-//						halved_ticks = 0;
-//						target_rpm = 30;
-//				}
+			//	if(target_rpm > 50){
+					halved_ticks = 0;
+					half_encoder_ticks = half_encoder_ticks >> 1; //reduces the new half way point by 2.
+					target_rpm = target_rpm/2 ; //reduce the target rpm by half
+			//	}
+		//	else{
+
+					//	halved_ticks = 0;
+					//	target_rpm = 30;
+				//}
 			}
 
 			if(motor_ticks >= (encoder_ticks)){
@@ -80,16 +80,17 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 		}
 	}
+
+
 	target_rpm = 0;
+	apply_electronic_break();
 	delay_ms(1000);//wait a second.
-
-
 		if(dir == 0){
 				dir = 1;
 				GPIOC->ODR &= ~(1 << 4);  // Set PA4 to low
 				delay_ms(1);
 				GPIOC->ODR |= (1 << 5);
-				target_rpm = 20;
+				target_rpm = 5;
 
 			}
 			else{
@@ -99,7 +100,7 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 				delay_ms(1);
 				GPIOC->ODR &= ~(1 << 5);
 				// Set PA5 to low
-				target_rpm = 20;
+				target_rpm = 5;
 			}
 
 		overshot = 0;
@@ -122,10 +123,20 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 	motor_ticks = 0;
 	target_rpm = 0;
+	apply_electronic_break();
 
 
 
 
+
+
+}
+
+void apply_electronic_break(void){
+
+
+			GPIOC ->ODR |= (1<<4);  //Set PA4 to high to set direction pins to same high value.
+			GPIOC->ODR |= (1 << 5);
 
 }
 

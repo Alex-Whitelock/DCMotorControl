@@ -1009,6 +1009,114 @@ Discarded input sections
  .bss           0x00000000        0x0 ./system/src/cmsis/vectors_stm32f0xx.o
  .debug_macro   0x00000000      0x832 ./system/src/cmsis/vectors_stm32f0xx.o
  .debug_macro   0x00000000      0x34e ./system/src/cmsis/vectors_stm32f0xx.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .group         0x00000000        0x8 ./src/MotorCommunication.o
+ .text          0x00000000        0x0 ./src/MotorCommunication.o
+ .data          0x00000000        0x0 ./src/MotorCommunication.o
+ .bss           0x00000000        0x0 ./src/MotorCommunication.o
+ .text.UART_Init
+                0x00000000       0x98 ./src/MotorCommunication.o
+ .debug_info    0x00000000      0x666 ./src/MotorCommunication.o
+ .debug_abbrev  0x00000000      0x161 ./src/MotorCommunication.o
+ .debug_loc     0x00000000       0x68 ./src/MotorCommunication.o
+ .debug_aranges
+                0x00000000       0x20 ./src/MotorCommunication.o
+ .debug_ranges  0x00000000       0x10 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x236 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x832 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x7a ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x34e ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x35 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x26 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x30d ./src/MotorCommunication.o
+ .debug_macro   0x00000000     0x5b9e ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x2ec ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x3cf ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x191 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x46 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0xd9 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0xef ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x184 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x7c ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x295 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0xd7 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x23d ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x185 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x184 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x2a0 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x70 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0xdf ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x4e3 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x4c5 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x397 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x750 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x353 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x34 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x3a ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x58 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x22 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x35 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x9c ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x16 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x10e ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x8d ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x4a ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x52 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x16 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x43 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x187 ./src/MotorCommunication.o
+ .debug_macro   0x00000000      0x329 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x16 ./src/MotorCommunication.o
+ .debug_macro   0x00000000       0x29 ./src/MotorCommunication.o
+ .debug_line    0x00000000      0x531 ./src/MotorCommunication.o
+ .debug_str     0x00000000    0x41fb7 ./src/MotorCommunication.o
+ .comment       0x00000000       0x6f ./src/MotorCommunication.o
+ .debug_frame   0x00000000       0x2c ./src/MotorCommunication.o
+ .ARM.attributes
+                0x00000000       0x31 ./src/MotorCommunication.o
  .group         0x00000000        0x8 ./src/_write.o
  .text          0x00000000        0x0 ./src/_write.o
  .data          0x00000000        0x0 ./src/_write.o
@@ -1411,6 +1519,7 @@ LOAD ./system/src/cortexm/_reset_hardware.o
 LOAD ./system/src/cortexm/exception_handlers.o
 LOAD ./system/src/cmsis/system_stm32f0xx.o
 LOAD ./system/src/cmsis/vectors_stm32f0xx.o
+LOAD ./src/MotorCommunication.o
 LOAD ./src/_write.o
 LOAD ./src/delay.o
 LOAD ./src/main.o

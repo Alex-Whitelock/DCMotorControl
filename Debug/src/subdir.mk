@@ -4,18 +4,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../src/MotorCommunication.c \
 ../src/_write.c \
 ../src/delay.c \
 ../src/main.c \
 ../src/motor.c 
 
 OBJS += \
+./src/MotorCommunication.o \
 ./src/_write.o \
 ./src/delay.o \
 ./src/main.o \
 ./src/motor.o 
 
 C_DEPS += \
+./src/MotorCommunication.d \
 ./src/_write.d \
 ./src/delay.d \
 ./src/main.d \

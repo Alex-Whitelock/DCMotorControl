@@ -5,6 +5,7 @@
 #include "stm32f0xx.h"
 #include "delay.h"
 #include "motor.h"
+#include "MotorCommunication.h"
 
 
 #pragma GCC diagnostic push
@@ -95,19 +96,19 @@ int main(int argc, char* argv[]) {
     SysTick_setCallback(&debounce_button);  // Register callback to debounce and manage button
 
     motor_init();                           // Initialize motor code
-
+    UART_Init(9600);						// Initialize the UART communication for the motor and other stuff in the future.
     while (1) {
 
 
 
-   	  if(GPIOA->IDR & (1 << 0)) {
-  		  move_motor(800,1);
+//   	  if(GPIOA->IDR & (1 << 0)) {
+//  		  move_motor(800,1);
+//
+//   	  }
+   	// target_rpm = 0;
 
-   	  }
-   	 target_rpm = 0;
 
-
-        GPIOC->ODR ^= GPIO_ODR_9;           // Toggle green LED (heartbeat)
+        //GPIOC->ODR ^= GPIO_ODR_9;           // Toggle green LED (heartbeat)
         encoder_count = TIM2->CNT;
         delay_ms(128);                      // Delay 1/8 second
     }

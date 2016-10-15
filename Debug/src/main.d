@@ -27,7 +27,7 @@ src/main.o: ../src/main.c ../system/include/diag/Trace.h \
  ../system/include/stm32f0-stdperiph/stm32f0xx_usart.h \
  ../system/include/stm32f0-stdperiph/stm32f0xx_wwdg.h \
  ../system/include/stm32f0-stdperiph/stm32f0xx_misc.h ../src/delay.h \
- ../src/motor.h
+ ../src/motor.h ../src/MotorCommunication.h
 
 ../system/include/diag/Trace.h:
 
@@ -94,3 +94,5 @@ src/main.o: ../src/main.c ../system/include/diag/Trace.h \
 ../src/delay.h:
 
 ../src/motor.h:
+
+../src/MotorCommunication.h:

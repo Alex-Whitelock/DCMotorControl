@@ -258,7 +258,7 @@ void encoder_init(void) {
     TIM6->CR1 |= TIM_CR1_CEN;               // Enable Timer
 
     NVIC_EnableIRQ(17);          // Enable interrupt in NVIC
-    NVIC_SetPriority(17,2);
+    NVIC_SetPriority(17,1);
 }
 
 // Encoder interrupt to calculate motor speed, also manages PI controller

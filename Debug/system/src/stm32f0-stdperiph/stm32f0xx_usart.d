@@ -1,6 +1,7 @@
-src/MotorCommunication.o: ../src/MotorCommunication.c \
- ../src/MotorCommunication.h ../system/include/cmsis/stm32f0xx.h \
- ../system/include/cmsis/core_cm0.h \
+system/src/stm32f0-stdperiph/stm32f0xx_usart.o: \
+ ../system/src/stm32f0-stdperiph/stm32f0xx_usart.c \
+ ../system/include/stm32f0-stdperiph/stm32f0xx_usart.h \
+ ../system/include/cmsis/stm32f0xx.h ../system/include/cmsis/core_cm0.h \
  ../system/include/cmsis/core_cmInstr.h \
  ../system/include/cmsis/cmsis_gcc.h \
  ../system/include/cmsis/core_cmFunc.h \
@@ -25,12 +26,10 @@ src/MotorCommunication.o: ../src/MotorCommunication.c \
  ../system/include/stm32f0-stdperiph/stm32f0xx_rtc.h \
  ../system/include/stm32f0-stdperiph/stm32f0xx_spi.h \
  ../system/include/stm32f0-stdperiph/stm32f0xx_tim.h \
- ../system/include/stm32f0-stdperiph/stm32f0xx_usart.h \
  ../system/include/stm32f0-stdperiph/stm32f0xx_wwdg.h \
- ../system/include/stm32f0-stdperiph/stm32f0xx_misc.h ../src/motor.h \
- ../system/include/diag/Trace.h ../src/delay.h
+ ../system/include/stm32f0-stdperiph/stm32f0xx_misc.h
 
-../src/MotorCommunication.h:
+../system/include/stm32f0-stdperiph/stm32f0xx_usart.h:
 
 ../system/include/cmsis/stm32f0xx.h:
 
@@ -86,14 +85,6 @@ src/MotorCommunication.o: ../src/MotorCommunication.c \
 
 ../system/include/stm32f0-stdperiph/stm32f0xx_tim.h:
 
-../system/include/stm32f0-stdperiph/stm32f0xx_usart.h:
-
 ../system/include/stm32f0-stdperiph/stm32f0xx_wwdg.h:
 
 ../system/include/stm32f0-stdperiph/stm32f0xx_misc.h:
-
-../src/motor.h:
-
-../system/include/diag/Trace.h:
-
-../src/delay.h:

@@ -135,10 +135,10 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 }
 
 void set_initial_target_rpm(int16_t encoder_ticks){
-	if(encoder_ticks > 4800){
+	if(encoder_ticks > 6400){
 		target_rpm = max_rpm;
 	}
-	else if(encoder_ticks <= 4799 && encoder_ticks>3200){
+	else if(encoder_ticks <= 6400 && encoder_ticks>3200){
 		target_rpm = max_rpm/2;
 	}
 	else if(encoder_ticks <= 3200 && encoder_ticks >1600){

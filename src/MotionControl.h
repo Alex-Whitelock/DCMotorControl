@@ -18,13 +18,3 @@ void sense_motion();
 void motor_reset();
 
 #endif /* MOTIONCONTROL_H_ */
-
-
-static const uint16_t NORTH =0;
-static const uint16_t NORTH_EAST=1600;
-static const uint16_t EAST =3200;
-static const uint16_t SOUTH_EAST= 4800;
-static const uint16_t SOUTH= 6400;
-static const uint16_t SOUTH_WEST=8000;
-static const uint16_t WEST=9600;
-static const uint16_t NORTH_WEST=11200;

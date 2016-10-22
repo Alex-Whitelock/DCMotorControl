@@ -28,12 +28,8 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 	target_rpm = 0;
 	delay_ms(500);
-
 	motor_ticks = 0;// intitialize the motor ticks to 0.
-
 	dir = _dir;//set the global direction to the new one.
-
-
 
 	if(dir == 0){
 		GPIOC->ODR |= (1 << 4);  // Set PA4 to high
@@ -132,8 +128,6 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 		}
 
-
-
 	motor_ticks = 0;
 	target_rpm = 0;
 	apply_electronic_break();
@@ -141,10 +135,10 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 }
 
 void set_initial_target_rpm(int16_t encoder_ticks){
-	if(encoder_ticks > 4800){
+	if(encoder_ticks > 6400){
 		target_rpm = max_rpm;
 	}
-	else if(encoder_ticks <= 4799 && encoder_ticks>3200){
+	else if(encoder_ticks <= 6400 && encoder_ticks>3200){
 		target_rpm = max_rpm/2;
 	}
 	else if(encoder_ticks <= 3200 && encoder_ticks >1600){
@@ -158,7 +152,6 @@ void set_initial_target_rpm(int16_t encoder_ticks){
 }
 
 void apply_electronic_break(void){
-
 
 			GPIOC ->ODR |= (1<<4);  //Set PA4 to high to set direction pins to same high value.
 			GPIOC->ODR |= (1 << 5);
@@ -265,7 +258,7 @@ void encoder_init(void) {
     TIM6->CR1 |= TIM_CR1_CEN;               // Enable Timer
 
     NVIC_EnableIRQ(17);          // Enable interrupt in NVIC
-    NVIC_SetPriority(17,2);
+    NVIC_SetPriority(17,1);
 }
 
 // Encoder interrupt to calculate motor speed, also manages PI controller

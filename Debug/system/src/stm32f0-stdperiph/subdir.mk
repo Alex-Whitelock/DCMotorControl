@@ -5,15 +5,21 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../system/src/stm32f0-stdperiph/stm32f0xx_gpio.c \
-../system/src/stm32f0-stdperiph/stm32f0xx_rcc.c 
+../system/src/stm32f0-stdperiph/stm32f0xx_rcc.c \
+../system/src/stm32f0-stdperiph/stm32f0xx_tim.c \
+../system/src/stm32f0-stdperiph/stm32f0xx_usart.c 
 
 OBJS += \
 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o \
-./system/src/stm32f0-stdperiph/stm32f0xx_rcc.o 
+./system/src/stm32f0-stdperiph/stm32f0xx_rcc.o \
+./system/src/stm32f0-stdperiph/stm32f0xx_tim.o \
+./system/src/stm32f0-stdperiph/stm32f0xx_usart.o 
 
 C_DEPS += \
 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.d \
-./system/src/stm32f0-stdperiph/stm32f0xx_rcc.d 
+./system/src/stm32f0-stdperiph/stm32f0xx_rcc.d \
+./system/src/stm32f0-stdperiph/stm32f0xx_tim.d \
+./system/src/stm32f0-stdperiph/stm32f0xx_usart.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

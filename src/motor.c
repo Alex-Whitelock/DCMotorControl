@@ -22,6 +22,40 @@ void motor_init(void) {
     ADC_init();
 }
 
+//under no circumstances change the direction of the motor while it is moving.
+void motor_go(uint8_t _target_rpm, uint8_t _dir) {
+
+	if(_dir == 0){
+			GPIOC->ODR |= (1 << 4);  // Set PA4 to high
+			GPIOC->ODR &= ~(1 << 5); // Set PA5 to low
+
+		}
+		else{
+			GPIOC->ODR &= ~(1 << 4);  // Set PA4 to low
+			GPIOC->ODR |= (1 << 5); // Set PA5 to high
+		}
+
+	dir = _dir;
+
+	target_rpm = _target_rpm;
+
+}
+
+void motor_stop(void) {
+
+
+	//May want to add some efficient stoping.
+	int temp_rpm = target_rpm;
+	target_rpm = 0;
+
+	if(temp_rpm < 50){
+		apply_electronic_break();
+	}
+
+}
+
+
+
 
 void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
@@ -175,8 +209,8 @@ void pwm_init(void) {
 
     /// TODO: Initialize one direction pin to high, the other low
 
-	GPIOC->ODR |= (1 << 4);  // Set PA4 to high
-	GPIOC->ODR &= ~(1 << 5); // Set PA5 to low
+	GPIOC->ODR |= (1 << 4);  // Set Pc4 to high
+	GPIOC->ODR &= ~(1 << 5); // Set Pc5 to low
 
 
     /* Hint: These pins are processor outputs, inputs to the H-bridge

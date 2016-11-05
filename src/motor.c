@@ -26,13 +26,13 @@ void motor_init(void) {
 void motor_go(uint8_t _target_rpm, uint8_t _dir) {
 
 	if(_dir == 0){
-			GPIOC->ODR |= (1 << 4);  // Set PA4 to high
-			GPIOC->ODR &= ~(1 << 5); // Set PA5 to low
+			GPIOC->ODR |= (1 << 11);  // Set PA4 to high
+			GPIOC->ODR &= ~(1 << 12); // Set PA5 to low
 
 		}
 		else{
-			GPIOC->ODR &= ~(1 << 4);  // Set PA4 to low
-			GPIOC->ODR |= (1 << 5); // Set PA5 to high
+			GPIOC->ODR &= ~(1 << 11);  // Set PA4 to low
+			GPIOC->ODR |= (1 << 12); // Set PA5 to high
 		}
 
 	dir = _dir;
@@ -66,13 +66,13 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 	dir = _dir;//set the global direction to the new one.
 
 	if(dir == 0){
-		GPIOC->ODR |= (1 << 4);  // Set PA4 to high
-		GPIOC->ODR &= ~(1 << 5); // Set PA5 to low
+		GPIOC->ODR |= (1 << 11);  // Set PA4 to high
+		GPIOC->ODR &= ~(1 << 12); // Set PA5 to low
 
 	}
 	else{
-		GPIOC->ODR &= ~(1 << 4);  // Set PA4 to low
-		GPIOC->ODR |= (1 << 5); // Set PA5 to high
+		GPIOC->ODR &= ~(1 << 11);  // Set PA4 to low
+		GPIOC->ODR |= (1 << 12); // Set PA5 to high
 	}
 
 	set_initial_target_rpm(encoder_ticks);
@@ -130,18 +130,18 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 	delay_ms(1000);//wait a second.
 		if(dir == 0){
 				dir = 1;
-				GPIOC->ODR &= ~(1 << 4);  // Set PA4 to low
+				GPIOC->ODR &= ~(1 << 11);  // Set PA4 to low
 				delay_ms(1);
-				GPIOC->ODR |= (1 << 5);
+				GPIOC->ODR |= (1 << 12);
 				target_rpm = 5;
 
 			}
 			else{
 				dir = 0;
 				//Set PA4 to high
-				GPIOC->ODR |= (1 << 4);
+				GPIOC->ODR |= (1 << 11);
 				delay_ms(1);
-				GPIOC->ODR &= ~(1 << 5);
+				GPIOC->ODR &= ~(1 << 12);
 				// Set PA5 to low
 				target_rpm = 5;
 			}
@@ -187,8 +187,8 @@ void set_initial_target_rpm(int16_t encoder_ticks){
 
 void apply_electronic_break(void){
 
-			GPIOC ->ODR |= (1<<4);  //Set PA4 to high to set direction pins to same high value.
-			GPIOC->ODR |= (1 << 5);
+			GPIOC ->ODR |= (1<<11);  //Set PA4 to high to set direction pins to same high value.
+			GPIOC->ODR |= (1 << 12);
 
 }
 
@@ -203,14 +203,14 @@ void pwm_init(void) {
 
     /// TODO: Set up a few GPIO output pins for direction control
 	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;  // Set up the c gpio to be used, turn on the clock for C gpio.
-	GPIOC->MODER |=GPIO_MODER_MODER4_0; // Set the PA4 to general purpose output mode
-	GPIOC->MODER |=GPIO_MODER_MODER5_0; // Set the PA5 to general purpose output mode
+	GPIOC->MODER |=GPIO_MODER_MODER11_0; // Set the PA4 to general purpose output mode
+	GPIOC->MODER |=GPIO_MODER_MODER12_0; // Set the PA5 to general purpose output mode
 
 
     /// TODO: Initialize one direction pin to high, the other low
 
-	GPIOC->ODR |= (1 << 4);  // Set Pc4 to high
-	GPIOC->ODR &= ~(1 << 5); // Set Pc5 to low
+	GPIOC->ODR |= (1 << 11);  // Set Pc4 to high
+	GPIOC->ODR &= ~(1 << 12); // Set Pc5 to low
 
 
     /* Hint: These pins are processor outputs, inputs to the H-bridge

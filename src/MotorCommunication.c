@@ -35,10 +35,18 @@ void UART_Init(uint32_t speed){
 	//aslso pairty control is disabled. and in even parity
 		//PA3_is the usart2_RX data input
 		//PA2 is the usart2_TX data output
-	GPIOA->MODER |= 1<<5;//Enable 2 for alternate function mode for e pa2
-	GPIOA->MODER |= 1<<7;//ENABLE PA3 for alternate function mode.
-	GPIOA->AFR[0] |= (1<<8);//choose AF1 for pin 2
-	GPIOA ->AFR[0] |= (1<<12);//choose af1 for pin 3
+	//GPIOA->MODER |= 1<<5;//Enable 2 for alternate function mode for e pa2
+	//GPIOA->MODER |= 1<<7;//ENABLE PA3 for alternate function mode.
+
+	GPIOA-> MODER |= 1<<29; //ENABLE PA14 For alternate function mode.
+	GPIOA-> MODER |= 1<<31;//ENABLE PA15 for alternate function mode.
+
+	//GPIOA->AFR[0] |= (1<<8);//choose AF1 for pin 2
+	//GPIOA ->AFR[0] |= (1<<12);//choose af1 for pin 3
+
+	//need to set this up to be af1 in afr high register.
+	GPIOA->AFR[1]  |= (1<<24); //put pa14 into af1
+	GPIOA -> AFR[1] |= (1 << 28 );// put pa15 into af1
 
 	//send a clock to the usart register
 

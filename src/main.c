@@ -5,6 +5,7 @@
 #include "stm32f0xx.h"
 #include "delay.h"
 #include "motor.h"
+#include "MotionControl.h"
 #include "MotorCommunication.h"
 
 
@@ -94,12 +95,20 @@ int main(int argc, char* argv[]) {
     LED_init();                             // Initialize LED's
     button_init();                          // Initialize button
     SysTick_setCallback(&debounce_button);  // Register callback to debounce and manage button
+    motion_init();
+
+
 
     motor_init();                           // Initialize motor code
     UART_Init(9600);						// Initialize the UART communication for the motor and other stuff in the future.
     while (1) {
 
 
+
+    	if(isArmed == 1){
+    		sense_motion();
+    		delay_ms(1000);
+    	}
 
 
 

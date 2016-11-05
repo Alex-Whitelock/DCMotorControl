@@ -28,6 +28,7 @@ void UART_Init(uint32_t speed){
 						- Hardware flow control disabled (RTS and CTS signals)
 						- Receive and transmit enabled
 			*/
+	isArmed = 0;
 
 	RCC->AHBENR|=RCC_AHBENR_GPIOAEN;
 	RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
@@ -113,6 +114,11 @@ void USART2_IRQHandler(void)
     	} else if(UART_rx_buffer[0] == 'x') {
     		is_motor_go = 1;
     		motor_speed = 100;
+    	} else if(UART_rx_buffer[0] == 'q') {
+    		if(isArmed == 0)
+    			isArmed = 1;
+    		else
+    			isArmed = 0;
     	} else if(UART_rx_buffer[0] == 'y') {
     		is_motor_go = 1;
     		motor_speed = 50;
@@ -129,6 +135,7 @@ void USART2_IRQHandler(void)
 
 
 
+    	if(isArmed == 0){
 
     	if( UART_rx_buffer[1] == '0'){
     		direction = 0;
@@ -157,6 +164,7 @@ void USART2_IRQHandler(void)
     	encoder_ticks = 0;
     	direction =0;
 
+    }
     }
 
 

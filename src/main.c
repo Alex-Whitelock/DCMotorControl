@@ -101,11 +101,6 @@ int main(int argc, char* argv[]) {
 
 
 
-//   	  if(GPIOA->IDR & (1 << 0)) {
-//  		  move_motor(800,1);
-//
-//   	  }
-   	// target_rpm = 0;
 
 
         //GPIOC->ODR ^= GPIO_ODR_9;           // Toggle green LED (heartbeat)

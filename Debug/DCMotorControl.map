@@ -2186,10 +2186,10 @@ END GROUP
 
 .inits          0x08000218       0x28
                 0x08000218                __data_regions_array_start = .
-                0x08000218        0x4 LONG 0x8001040 LOADADDR (.data)
+                0x08000218        0x4 LONG 0x8001054 LOADADDR (.data)
                 0x0800021c        0x4 LONG 0x20000000 ADDR (.data)
                 0x08000220        0x4 LONG 0x20000028 (ADDR (.data) + SIZEOF (.data))
-                0x08000224        0x4 LONG 0x8001040 LOADADDR (.data_CCMRAM)
+                0x08000224        0x4 LONG 0x8001054 LOADADDR (.data_CCMRAM)
                 0x08000228        0x4 LONG 0x0 ADDR (.data_CCMRAM)
                 0x0800022c        0x4 LONG 0x0 (ADDR (.data_CCMRAM) + SIZEOF (.data_CCMRAM))
                 0x08000230                __data_regions_array_end = .
@@ -2221,7 +2221,7 @@ END GROUP
 .flashtext
  *(.flashtext .flashtext.*)
 
-.text           0x08000240      0xe00
+.text           0x08000240      0xe14
  *(.text .text.*)
  .text.USART_ReceiveData
                 0x08000240       0x44 ./system/src/stm32f0-stdperiph/stm32f0xx_usart.o
@@ -2283,90 +2283,90 @@ END GROUP
  .text.main     0x080008a4       0x44 ./src/main.o
                 0x080008a4                main
  .text.motor_go
-                0x080008e8       0x4c ./src/motor.o
+                0x080008e8       0x54 ./src/motor.o
                 0x080008e8                motor_go
  .text.set_initial_target_rpm
-                0x08000934       0x58 ./src/motor.o
-                0x08000934                set_initial_target_rpm
+                0x0800093c       0x58 ./src/motor.o
+                0x0800093c                set_initial_target_rpm
  .text.apply_electronic_break
-                0x0800098c       0x1c ./src/motor.o
-                0x0800098c                apply_electronic_break
+                0x08000994       0x1c ./src/motor.o
+                0x08000994                apply_electronic_break
  .text.motor_stop
-                0x080009a8       0x1c ./src/motor.o
-                0x080009a8                motor_stop
+                0x080009b0       0x1c ./src/motor.o
+                0x080009b0                motor_stop
  .text.move_motor
-                0x080009c4      0x1ec ./src/motor.o
-                0x080009c4                move_motor
+                0x080009cc      0x1f4 ./src/motor.o
+                0x080009cc                move_motor
  .text.pwm_init
-                0x08000bb0       0xa0 ./src/motor.o
-                0x08000bb0                pwm_init
+                0x08000bc0       0xa4 ./src/motor.o
+                0x08000bc0                pwm_init
  .text.pwm_setDutyCycle
-                0x08000c50       0x1c ./src/motor.o
-                0x08000c50                pwm_setDutyCycle
+                0x08000c64       0x1c ./src/motor.o
+                0x08000c64                pwm_setDutyCycle
  .text.encoder_init
-                0x08000c6c       0xc0 ./src/motor.o
-                0x08000c6c                encoder_init
+                0x08000c80       0xc0 ./src/motor.o
+                0x08000c80                encoder_init
  .text.ADC_init
-                0x08000d2c       0x80 ./src/motor.o
-                0x08000d2c                ADC_init
+                0x08000d40       0x80 ./src/motor.o
+                0x08000d40                ADC_init
  .text.motor_init
-                0x08000dac       0x10 ./src/motor.o
-                0x08000dac                motor_init
+                0x08000dc0       0x10 ./src/motor.o
+                0x08000dc0                motor_init
  .text.PI_update
-                0x08000dbc       0xfc ./src/motor.o
-                0x08000dbc                PI_update
+                0x08000dd0       0xfc ./src/motor.o
+                0x08000dd0                PI_update
  .text.TIM6_DAC_IRQHandler
-                0x08000eb8       0x3c ./src/motor.o
-                0x08000eb8                TIM6_DAC_IRQHandler
- .text          0x08000ef4      0x114 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_udivsi3.o)
-                0x08000ef4                __aeabi_uidiv
-                0x08000ef4                __udivsi3
-                0x08001000                __aeabi_uidivmod
- .text          0x08001008        0x4 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_dvmd_tls.o)
-                0x08001008                __aeabi_idiv0
-                0x08001008                __aeabi_ldiv0
+                0x08000ecc       0x3c ./src/motor.o
+                0x08000ecc                TIM6_DAC_IRQHandler
+ .text          0x08000f08      0x114 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_udivsi3.o)
+                0x08000f08                __aeabi_uidiv
+                0x08000f08                __udivsi3
+                0x08001014                __aeabi_uidivmod
+ .text          0x0800101c        0x4 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_dvmd_tls.o)
+                0x0800101c                __aeabi_idiv0
+                0x0800101c                __aeabi_ldiv0
  *(.rodata .rodata.* .constdata .constdata.*)
  .rodata.str1.4
-                0x0800100c       0x34 ./system/src/stm32f0-stdperiph/stm32f0xx_usart.o
+                0x08001020       0x34 ./system/src/stm32f0-stdperiph/stm32f0xx_usart.o
                                  0x32 (size before relaxing)
  *(vtable)
  *(.eh_frame*)
  *(.glue_7)
- .glue_7        0x08001040        0x0 linker stubs
+ .glue_7        0x08001054        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x08001040        0x0 linker stubs
+ .glue_7t       0x08001054        0x0 linker stubs
 
-.vfp11_veneer   0x08001040        0x0
- .vfp11_veneer  0x08001040        0x0 linker stubs
+.vfp11_veneer   0x08001054        0x0
+ .vfp11_veneer  0x08001054        0x0 linker stubs
 
-.v4_bx          0x08001040        0x0
- .v4_bx         0x08001040        0x0 linker stubs
+.v4_bx          0x08001054        0x0
+ .v4_bx         0x08001054        0x0 linker stubs
 
-.iplt           0x08001040        0x0
- .iplt          0x08001040        0x0 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o
+.iplt           0x08001054        0x0
+ .iplt          0x08001054        0x0 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o
 
-.rel.dyn        0x08001040        0x0
- .rel.iplt      0x08001040        0x0 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o
+.rel.dyn        0x08001054        0x0
+ .rel.iplt      0x08001054        0x0 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x08001040                . = ALIGN (0x4)
-                0x08001040                __exidx_start = .
+                0x08001054                . = ALIGN (0x4)
+                0x08001054                __exidx_start = .
 
 .ARM.exidx
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-                0x08001040                __exidx_end = .
-                0x08001040                . = ALIGN (0x4)
-                0x08001040                _etext = .
-                0x08001040                __etext = .
+                0x08001054                __exidx_end = .
+                0x08001054                . = ALIGN (0x4)
+                0x08001054                _etext = .
+                0x08001054                __etext = .
 
-.data_CCMRAM    0x00000000        0x0 load address 0x08001040
+.data_CCMRAM    0x00000000        0x0 load address 0x08001054
  FILL mask 0xff
  *(.data.CCMRAM .data.CCMRAM.*)
                 0x00000000                . = ALIGN (0x4)
-                0x08001040                _sidata = LOADADDR (.data)
+                0x08001054                _sidata = LOADADDR (.data)
 
-.data           0x20000000       0x28 load address 0x08001040
+.data           0x20000000       0x28 load address 0x08001054
  FILL mask 0xff
                 0x20000000                _sdata = .
                 0x20000000                __data_start__ = .
@@ -2392,7 +2392,7 @@ END GROUP
                 0x20000028                _edata = .
                 0x20000028                __data_end__ = .
 
-.igot.plt       0x20000028        0x0 load address 0x08001068
+.igot.plt       0x20000028        0x0 load address 0x0800107c
  .igot.plt      0x20000028        0x0 ./system/src/stm32f0-stdperiph/stm32f0xx_gpio.o
 
 .bss_CCMRAM     0x00000000        0x0
@@ -2652,7 +2652,7 @@ END GROUP
  .debug_line    0x00003de9      0x632 ./src/main.o
  .debug_line    0x0000441b      0x74a ./src/motor.o
 
-.debug_frame    0x00000000      0xaf0
+.debug_frame    0x00000000      0xae8
  *(.debug_frame)
  .debug_frame   0x00000000      0x550 ./system/src/stm32f0-stdperiph/stm32f0xx_usart.o
  .debug_frame   0x00000550       0x38 ./system/src/newlib/_exit.o
@@ -2667,8 +2667,8 @@ END GROUP
  .debug_frame   0x00000828       0xc4 ./src/MotorCommunication.o
  .debug_frame   0x000008ec       0x70 ./src/delay.o
  .debug_frame   0x0000095c       0x58 ./src/main.o
- .debug_frame   0x000009b4      0x11c ./src/motor.o
- .debug_frame   0x00000ad0       0x20 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_udivsi3.o)
+ .debug_frame   0x000009b4      0x114 ./src/motor.o
+ .debug_frame   0x00000ac8       0x20 c:/program files (x86)/gnu tools arm embedded/5.2 2015q4/bin/../lib/gcc/arm-none-eabi/5.2.1/armv6-m\libgcc.a(_udivsi3.o)
 
 .debug_str      0x00000000    0x463d6
  *(.debug_str)

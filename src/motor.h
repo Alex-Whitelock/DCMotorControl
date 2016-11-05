@@ -53,6 +53,12 @@ void PI_update(void);
 
 void move_motor(int16_t encoder_ticks, uint8_t _dir);
 
+//The method starts up the motor at a specific rpm and direction,until motor stop is called.
+void motor_go(uint8_t _target_rpm, uint8_t _dir);
+
+//Simply sets the target rpm of the motor down to zero.
+void motor_stop();
+
 
 
 /* -------------------------------------------------------------------------------------------------------------

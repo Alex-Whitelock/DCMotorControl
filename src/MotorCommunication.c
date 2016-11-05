@@ -66,6 +66,9 @@ void USART2_IRQHandler(void)
 
 	int16_t  encoder_ticks = 0;
 	uint8_t direction = 0;
+	uint8_t is_motor_go =0;
+	uint8_t motor_speed =0;
+	uint8_t is_motor_stop = 0;
 
 	//int i;
 	//char armedReceive [40];
@@ -88,15 +91,31 @@ void USART2_IRQHandler(void)
     		encoder_ticks = 12800;
 
     	} else if (UART_rx_buffer[0] == 'b') {
+    		is_motor_go = 0;
     		encoder_ticks = 6400;
     	} else if(UART_rx_buffer[0] == 'c') {
+    		is_motor_go = 0;
     		encoder_ticks = 3200;
     	} else if(UART_rx_buffer[0] == 'd') {
+    		is_motor_go = 0;
     		encoder_ticks = 1600;
     	} else if(UART_rx_buffer[0] == 'e') {
+    		is_motor_go = 0;
     		encoder_ticks = 800;
+    	} else if(UART_rx_buffer[0] == 'x') {
+    		is_motor_go = 1;
+    		motor_speed = 100;
+    	} else if(UART_rx_buffer[0] == 'y') {
+    		is_motor_go = 1;
+    		motor_speed = 50;
+    	} else if(UART_rx_buffer[0] == 'z') {
+    		is_motor_go = 1;
+    		motor_speed = 25;
     	}
-    	else {
+    	else if(UART_rx_buffer[0] == 's') {
+    		is_motor_stop = 1;
+    	} else {
+    		is_motor_go = 0;
     		encoder_ticks = 0;
     	}
 
@@ -112,9 +131,19 @@ void USART2_IRQHandler(void)
     		direction = 0;
     	}
 
+    	if(is_motor_stop) {
+    		motor_stop();
+    	}
+    	else {
+			if(is_motor_go && (UART_rx_counter == 1)){
+				motor_go(motor_speed,direction);
+			}
+			else {
 
-    	if(encoder_ticks > 0) {
-    		move_motor(encoder_ticks, direction);
+				if((encoder_ticks > 0 ) && (UART_rx_counter == 1)) {
+					move_motor(encoder_ticks, direction);
+				}
+			}
     	}
 
     	encoder_ticks = 0;

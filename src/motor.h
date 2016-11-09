@@ -60,6 +60,9 @@ void motor_go(uint8_t _target_rpm, uint8_t _dir);
 //Simply sets the target rpm of the motor down to zero.
 void motor_stop();
 
+//reset the motor back to north position.
+void reset_motor();
+
 
 
 /* -------------------------------------------------------------------------------------------------------------

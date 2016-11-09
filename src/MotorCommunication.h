@@ -12,10 +12,12 @@
 #include <stdlib.h>
 #include "stm32f0xx_usart.h"//note need to ensure that this is not ignored by eclipse
 #include "motor.h"
+#include "MotionControl.h"
 
 void UART_Init(uint32_t speed);
 
 volatile int isArmed;
+volatile int is_stm_controlled;
 void UART_PutChar(unsigned char c);
 void UART_PutStr(char *str);
 void UART_ClearRxBuffer(void);

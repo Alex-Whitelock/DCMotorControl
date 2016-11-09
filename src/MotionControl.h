@@ -16,5 +16,6 @@ void motion_init();
 //void EXTI4_15_IRQHandler(void);
 void sense_motion();
 void motor_reset();
+uint8_t get_pir_information();
 
 #endif /* MOTIONCONTROL_H_ */

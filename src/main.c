@@ -106,8 +106,10 @@ int main(int argc, char* argv[]) {
 
 
     	if(isArmed == 1){
-    		sense_motion();
-    		delay_ms(1000);
+    		if(is_stm_controlled){
+				sense_motion();
+				delay_ms(1000);
+    		}
     	}
 
 

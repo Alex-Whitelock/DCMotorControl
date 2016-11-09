@@ -17,6 +17,7 @@ volatile uint8_t Ki=1;    // Set default integral gain
 
 // Sets up the entire motor drive system
 void motor_init(void) {
+	gear_position = 0;
     pwm_init();
     encoder_init();
     ADC_init();
@@ -244,6 +245,15 @@ void pwm_setDutyCycle(uint8_t duty) {
     }
 }
 
+void reset_motor(){
+
+	if(gear_position != 0){
+		//will need to experiment with the motor direction to ensure that I get to the right motor position.
+		move_motor(gear_position, 1);
+	}
+
+}
+
 // Sets up encoder interface to read motor speed
 void encoder_init(void) {
 
@@ -369,7 +379,12 @@ void PI_update(void) {
 		motor_ticks = motor_ticks + motor_speed;
 		halved_ticks = halved_ticks + motor_speed;
 
+		gear_position = gear_position + motor_speed;// ad the moto speed
 
+		if(gear_position < 0){
+			gear_position = 12800 - ((~gear_position)+1);
+		}
+		gear_position = gear_position % 12800;
 
 
     /* Hint: Remember that your calculated motor speed may not be directly in RPM!

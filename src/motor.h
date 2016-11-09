@@ -32,6 +32,7 @@ volatile int8_t overshot;
 volatile int8_t dir;
 volatile int16_t motor_ticks;
 volatile int16_t halved_ticks; //This is a havled ticks value to know when to decrease the value of the encoder ticks.
+volatile int16_t gear_position;
             // Integral gain
 
 

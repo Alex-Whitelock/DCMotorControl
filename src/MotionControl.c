@@ -64,6 +64,22 @@ void motion_init(){
 
 }
 
+uint8_t get_pir_information(){
+	int northSensor = ((GPIOB -> IDR)>>4)&1;
+	int eastSensor = ((GPIOB -> IDR)>>5)&1;
+	int southSensor = ((GPIOB -> IDR)>>6)&1;
+	int westSensor = ((GPIOB -> IDR)>>7)&1;
+
+	uint8_t pirInformation =0;
+	pirInformation = pirInformation | northSensor;
+	pirInformation = (pirInformation << 1) | eastSensor;
+	pirInformation = (pirInformation << 1) | southSensor;
+	pirInformation = (pirInformation << 1) |westSensor;
+
+	return pirInformation;
+
+}
+
 //This method senses motions and moves the motor accordingly to the right position from wherever it's last postion was
 
 void sense_motion(){

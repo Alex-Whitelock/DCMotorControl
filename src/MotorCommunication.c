@@ -63,6 +63,7 @@ void UART_Init(uint32_t speed){
 	NVIC_EnableIRQ(USART2_IRQn);
 	NVIC_SetPriority(USART2_IRQn, 2); // Set to medium priority
 	//isArmed=0;
+	is_stm_controlled = 1; //When the stm board is turned on the initial stm control should be turned on.
 
 	}
 
@@ -78,6 +79,7 @@ void USART2_IRQHandler(void)
 	uint8_t is_motor_go =0;
 	uint8_t motor_speed =0;
 	uint8_t is_motor_stop = 0;
+	uint8_t pir_information = 0;
 
 	//int i;
 	//char armedReceive [40];
@@ -88,88 +90,61 @@ void USART2_IRQHandler(void)
 
 
     //Most of this code will have to be changed once w
-    if(UART_rx_counter == 1) {
-
-    	GPIOC->ODR ^= GPIO_ODR_9;
-//    	encoder_ticks = encoder_ticks |(UART_rx_buffer[0] << 8);
-//
-//
-//    	encoder_ticks = encoder_ticks | UART_rx_buffer[1];
-
-    	if(UART_rx_buffer[0] == 'a'){
-    		encoder_ticks = 12800;
-
-    	} else if (UART_rx_buffer[0] == 'b') {
-    		is_motor_go = 0;
-    		encoder_ticks = 6400;
-    	} else if(UART_rx_buffer[0] == 'c') {
-    		is_motor_go = 0;
-    		encoder_ticks = 3200;
-    	} else if(UART_rx_buffer[0] == 'd') {
-    		is_motor_go = 0;
-    		encoder_ticks = 1600;
-    	} else if(UART_rx_buffer[0] == 'e') {
-    		is_motor_go = 0;
-    		encoder_ticks = 800;
-    	} else if(UART_rx_buffer[0] == 'x') {
-    		is_motor_go = 1;
-    		motor_speed = 100;
-    	} else if(UART_rx_buffer[0] == 'q') {
-    		if(isArmed == 0)
-    			isArmed = 1;
-    		else
-    			isArmed = 0;
-    	} else if(UART_rx_buffer[0] == 'y') {
-    		is_motor_go = 1;
-    		motor_speed = 50;
-    	} else if(UART_rx_buffer[0] == 'z') {
-    		is_motor_go = 1;
-    		motor_speed = 25;
-    	}
-    	else if(UART_rx_buffer[0] == 's') {
-    		is_motor_stop = 1;
-    	} else {
-    		is_motor_go = 0;
-    		encoder_ticks = 0;
-    	}
 
 
+    //Once we get to this part we need to decide which kind of instruction we are doing.
+    if(UART_rx_counter == 3){
 
-    	if(isArmed == 0){
+    	if(UART_rx_buffer[0] == 1) {
+    		//ask for pir information.
+    		pir_information = get_pir_information();
+    		UART_PutChar(pir_information);
 
-    	if( UART_rx_buffer[1] == '0'){
-    		direction = 0;
-    	} else if( UART_rx_buffer[1] == '1') {
-    		direction = 1;
-    	}
-    	else {
-    		direction = 0;
-    	}
+    	} else if(UART_rx_buffer[0] == 2) {
+    		//transfer total control to pi. Ensure that the  motor does not turn due to
+    		//pir sensors.
+    		is_stm_controlled = 0;//make it so that the stm is not controlled.
 
-    	if(is_motor_stop) {
-    		motor_stop();
-    	}
-    	else {
-			if(is_motor_go && (UART_rx_counter == 1)){
-				motor_go(motor_speed,direction);
-			}
-			else {
+    	} else if(UART_rx_buffer[0] == 3) {
+    		//This will move the motor.
+    		if(is_stm_controlled == 0){
+    			encoder_ticks = encoder_ticks | UART_rx_buffer[1];
+    			encoder_ticks = (encoder_ticks<<8) | UART_rx_buffer[2];
+    			direction = UART_rx_buffer[3];
 
-				if((encoder_ticks > 0 ) && (UART_rx_counter == 1)) {
-					move_motor(encoder_ticks, direction);
+    			move_motor(encoder_ticks, direction);
+    		}
+    	} else if(UART_rx_buffer[0] == 4) {
+    		//transfer total control from pi to stm.
+    		isArmed =1;
+    		is_stm_controlled = 1;
+    	} else if(UART_rx_buffer[0] == 5) {
+    		// set the motor speed
+    		if(is_stm_controlled == 0){
+				motor_speed = UART_rx_buffer[1];
+				if(motor_speed > 200){
+					motor_speed = 0; //could probably get rid of this.
+				} else {
+					//move motor. Be sure to ask
+					direction = UART_rx_buffer[2];
+					motor_go(motor_speed, direction);
 				}
-			}
+    		}
+    	} else if(UART_rx_buffer[0] == 6) {
+    		//reset method goes here.
+    		reset_motor();
+    	} else if(UART_rx_buffer[0] == 7) {
+    		//set a stop command.
+    		motor_stop();
+    	} else {
+    		//no-op
     	}
 
-    	encoder_ticks = 0;
-    	direction =0;
-
-    }
     }
 
 
 
-    if(UART_rx_counter == 1){
+    if(UART_rx_counter == 3){
     	UART_rx_counter = 0;
     } else {
     	GPIOC->ODR ^= GPIO_ODR_9;

@@ -7,7 +7,7 @@
 
 #include "MotorCommunication.h"
 
-#define UART_RX_BUFFER_LENGTH	16																		//maximum number of characters to hold in the receive buffer
+#define UART_RX_BUFFER_LENGTH	4																		//maximum number of characters to hold in the receive buffer
 #define	UART_TIMEOUT_MAX			94000
 
 char UART_rx_buffer[UART_RX_BUFFER_LENGTH];													//used by the IRQ handler
@@ -70,16 +70,17 @@ void UART_Init(uint32_t speed){
 //This is the interupt handler for the USART
 void USART2_IRQHandler(void)
 {
-//	int x;
+
 
 	//int i;
-
+	int x;
 	int16_t  encoder_ticks = 0;
 	uint8_t direction = 0;
 	uint8_t is_motor_go =0;
 	uint8_t motor_speed =0;
 	uint8_t is_motor_stop = 0;
 	uint8_t pir_information = 0;
+	char instructionCommand[4];
 
 	//int i;
 	//char armedReceive [40];
@@ -88,31 +89,48 @@ void USART2_IRQHandler(void)
 		/* Read one byte from the receive data register */
     UART_rx_buffer[UART_rx_counter] = USART_ReceiveData(USART2);
 
-
+    if(UART_rx_counter == 3){
+    	GPIOC -> ODR ^= GPIO_ODR_9;
+    }
     //Most of this code will have to be changed once w
 
 
     //Once we get to this part we need to decide which kind of instruction we are doing.
     if(UART_rx_counter == 3){
 
+
+    	//memset(instructionCommand, 0, UART_RX_BUFFER_LENGTH);
+    	for(x = 0 ; x < UART_RX_BUFFER_LENGTH; x ++){
+    		instructionCommand[x] = 0;
+    	}
+
     	if(UART_rx_buffer[0] == 1) {
-    		//ask for pir information.
-    		pir_information = get_pir_information();
-    		UART_PutChar(pir_information);
+//    		//ask for pir information.
+//    		pir_information = get_pir_information();
+//    		instructionCommand[0] = (uint8_t )1;
+//    		instructionCommand[1] =  pir_information;
+//    		UART_PutStr(instructionCommand);
+//    		UART_PutStr("Hello from p");
+//    		GPIOC -> ODR ^= GPIO_ODR_9;
+
+
+
+    		//UART_PutChar(pir_information);
 
     	} else if(UART_rx_buffer[0] == 2) {
-    		//transfer total control to pi. Ensure that the  motor does not turn due to
-    		//pir sensors.
-    		is_stm_controlled = 0;//make it so that the stm is not controlled.
+    		//This should never be done it is reserved for the pi as an instruction.
 
     	} else if(UART_rx_buffer[0] == 3) {
     		//This will move the motor.
     		if(is_stm_controlled == 0){
-    			encoder_ticks = encoder_ticks | UART_rx_buffer[1];
-    			encoder_ticks = (encoder_ticks<<8) | UART_rx_buffer[2];
-    			direction = UART_rx_buffer[3];
+//    			encoder_ticks = encoder_ticks | UART_rx_buffer[1];
+//    			encoder_ticks = (encoder_ticks<<8) | UART_rx_buffer[2];
+//    			direction = UART_rx_buffer[3];
+//    			move_motor(encoder_ticks, direction);
+//    			instructionCommand[0] = 2;
+//    			UART_PutStr(instructionCommand);
+    			UART_PutStr("Hello from move motor\n");
 
-    			move_motor(encoder_ticks, direction);
     		}
     	} else if(UART_rx_buffer[0] == 4) {
     		//transfer total control from pi to stm.
@@ -120,22 +138,22 @@ void USART2_IRQHandler(void)
     		is_stm_controlled = 1;
     	} else if(UART_rx_buffer[0] == 5) {
     		// set the motor speed
-    		if(is_stm_controlled == 0){
-				motor_speed = UART_rx_buffer[1];
-				if(motor_speed > 200){
-					motor_speed = 0; //could probably get rid of this.
-				} else {
-					//move motor. Be sure to ask
-					direction = UART_rx_buffer[2];
-					motor_go(motor_speed, direction);
-				}
-    		}
+//    		if(is_stm_controlled == 0){
+//				motor_speed = UART_rx_buffer[1];
+//				if(motor_speed > 200){
+//					motor_speed = 0; //could probably get rid of this.
+//				} else {
+//					//move motor. Be sure to ask
+//					direction = UART_rx_buffer[2];
+//					motor_go(motor_speed, direction);
+//				}
+//    		}
     	} else if(UART_rx_buffer[0] == 6) {
     		//reset method goes here.
-    		reset_motor();
+    		//reset_motor();
     	} else if(UART_rx_buffer[0] == 7) {
     		//set a stop command.
-    		motor_stop();
+    		//motor_stop();
     	} else {
     		//no-op
     	}
@@ -143,29 +161,27 @@ void USART2_IRQHandler(void)
     }
 
 
-
-    if(UART_rx_counter == 3){
-    	UART_rx_counter = 0;
-    } else {
-    	GPIOC->ODR ^= GPIO_ODR_9;
-    	UART_rx_counter ++;
-    }
+//
+//    if(UART_rx_counter == 3){
+//    	UART_rx_counter = 0;
+//    } else {
+//    	GPIOC->ODR ^= GPIO_ODR_9;
+//    	UART_rx_counter ++;
+//    }
 
 
 		/* if the last character received is the LF ('\r' or 0x0a) character OR if the UART_RX_BUFFER_LENGTH (40) value has been reached ...*/
-//    if((UART_rx_counter + 1 == UART_RX_BUFFER_LENGTH) || (UART_rx_buffer[UART_rx_counter] == 0x0a))
-//    {
-//      new_UART_msg = 1;
-//			for(x=0; x <= UART_rx_counter; x++)											//copy each character in the UART_rx_buffer to the UART_msg variable
-//				UART_msg[x] = UART_rx_buffer[x];
-//			UART_msg[x-1] = '\0';																		//terminate with NULL character
-//      memset(UART_rx_buffer, 0, UART_RX_BUFFER_LENGTH);				//clear UART_rx_buffer
-//      UART_rx_counter = 0;
-//    }
-//    else
-//    {
-//			UART_rx_counter++;
-//    }
+    if((UART_rx_counter + 1 == UART_RX_BUFFER_LENGTH))
+    {
+      new_UART_msg = 1;
+			for(x=0; x < UART_RX_BUFFER_LENGTH; x++)											//copy each character in the UART_rx_buffer to the UART_msg variable
+				UART_rx_buffer[x] = 0;
+      UART_rx_counter = 0;
+    }
+    else
+    {
+			UART_rx_counter++;
+    }
   }
 }
 

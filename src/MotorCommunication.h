@@ -10,6 +10,7 @@
 
 #include "stm32f0xx.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include "stm32f0xx_usart.h"//note need to ensure that this is not ignored by eclipse
 #include "motor.h"
 #include "MotionControl.h"

@@ -245,11 +245,15 @@ void pwm_setDutyCycle(uint8_t duty) {
     }
 }
 
+void go_to_quadrant(uint8_t quadrant){
+
+}
+
 void reset_motor(){
 
 	if(gear_position != 0){
 		//will need to experiment with the motor direction to ensure that I get to the right motor position.
-		move_motor(gear_position, 1);
+		move_motor(gear_position, 0);
 	}
 
 }

@@ -105,17 +105,17 @@ int main(int argc, char* argv[]) {
 
 
 
-    	if(isArmed == 1){
-    		if(is_stm_controlled){
-				sense_motion();
-				delay_ms(1000);
-    		}
-    	}
+//    	if(isArmed == 1){
+//    		if(is_stm_controlled){
+//				sense_motion();
+//				delay_ms(1000);
+//    		}
+//    	}
 
 
 
-        //GPIOC->ODR ^= GPIO_ODR_9;           // Toggle green LED (heartbeat)
-        encoder_count = TIM2->CNT;
+        GPIOC->ODR ^= GPIO_ODR_8;           // Toggle green LED (heartbeat)
+        //encoder_count = TIM2->CNT;
         delay_ms(128);                      // Delay 1/8 second
     }
 }

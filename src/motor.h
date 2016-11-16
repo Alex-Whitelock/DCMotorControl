@@ -63,6 +63,8 @@ void motor_stop();
 //reset the motor back to north position.
 void reset_motor();
 
+//Sets the muzzle of the turret in the quadrant specified
+void go_to_quadrant(uint8_t quadrant);
 
 
 /* -------------------------------------------------------------------------------------------------------------

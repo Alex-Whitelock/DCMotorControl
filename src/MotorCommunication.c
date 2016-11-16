@@ -29,6 +29,7 @@ void UART_Init(uint32_t speed){
 						- Receive and transmit enabled
 			*/
 	isArmed = 0;
+	is_stm_controlled = 0;
 
 	RCC->AHBENR|=RCC_AHBENR_GPIOAEN;
 	RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
@@ -63,7 +64,7 @@ void UART_Init(uint32_t speed){
 	NVIC_EnableIRQ(USART2_IRQn);
 	NVIC_SetPriority(USART2_IRQn, 2); // Set to medium priority
 	//isArmed=0;
-	is_stm_controlled = 1; //When the stm board is turned on the initial stm control should be turned on.
+	//is_stm_controlled = 1; //When the stm board is turned on the initial stm control should be turned on.
 
 	}
 
@@ -74,7 +75,9 @@ void USART2_IRQHandler(void)
 
 	//int i;
 
-	int16_t  encoder_ticks = 0;
+	uint16_t  encoder_ticks = 0;
+	uint8_t encoder_ticks_high = 0;
+	uint16_t encoder_ticks_low =0;
 	uint8_t direction = 0;
 	uint8_t is_motor_go =0;
 	uint8_t motor_speed =0;
@@ -99,73 +102,76 @@ void USART2_IRQHandler(void)
     	GPIOC->ODR ^= GPIO_ODR_9;
     	if(UART_rx_buffer[0] == 1) {
     		//ask for pir information.
-//    		pir_information = get_pir_information();
-//    		instruction[0] = 1;
-//    		instruction[1] = pir_information;
-//    		instruction[2] = 0;
-//    		instruction[3] = 0;
-//    		instruction[4] = '\0';
-//
-//    		UART_PutStr(instruction);
+    		pir_information = get_pir_information();
+    		instruction[0] = 1;
+    		instruction[1] = pir_information;
+    		instruction[2] = 0;
+    		instruction[3] = 0;
+    		instruction[4] = '\0';
 
-    		UART_PutStr("Hello from 1\0");
+    		UART_PutStr(instruction);
+
+    		//UART_PutStr("Hello from 1\0");
 
     	} else if(UART_rx_buffer[0] == 2) {
     		//transfer total control to pi. Ensure that the  motor does not turn due to
     		//pir sensors.
     		is_stm_controlled = 0;//make it so that the stm is not controlled.
-    		UART_PutStr("Hello from 2\0");
+    		//UART_PutStr("Hello from 2\0");
 
     	} else if(UART_rx_buffer[0] == 3) {
     		//This will move the motor.
-//    		if(is_stm_controlled == 0){
-//    			encoder_ticks = encoder_ticks | UART_rx_buffer[1];
-//    			encoder_ticks = (encoder_ticks<<8) | UART_rx_buffer[2];
-//    			direction = UART_rx_buffer[3];
-//
-//    			move_motor(encoder_ticks, direction);
-//    		}
-//
-//    		instruction[0] = 2;
-//    		instruction[1] = 0;
-//    		instruction[2] = 0;
-//    		instruction[3] = 0;
-//    		instruction[4] = '\0';
-//
-//    		//This tell the pi that it now has control of the pi again.
-//    		UART_PutStr(instruction);
+    		if(is_stm_controlled == 0){
+    			encoder_ticks_high = UART_rx_buffer[1] & 0xff;
+    			encoder_ticks_low = UART_rx_buffer[2] & 0xff;
+    			encoder_ticks = (encoder_ticks_high << 8) | encoder_ticks_low;
+    			direction = UART_rx_buffer[3];
 
-    		UART_PutStr("Hello from 3\0");
+
+    			move_motor(encoder_ticks, direction);
+    		}
+
+    		instruction[0] = 2;
+    		instruction[1] = 0;
+    		instruction[2] = 0;
+    		instruction[3] = 0;
+    		instruction[4] = '\0';
+
+    		//This tell the pi that it now has control of the pi again.
+    		UART_PutStr(instruction);
+
+
+    		//UART_PutStr("Hello from 3\0");
 
     	} else if(UART_rx_buffer[0] == 4) {
     		//transfer total control from pi to stm.
-    		//isArmed =1;
-    		//is_stm_controlled = 1;
+    		isArmed =1;
+    		is_stm_controlled = 1;
 
-    		UART_PutStr("Hello from 4\0");
+    		//UART_PutStr("Hello from 4\0");
     	} else if(UART_rx_buffer[0] == 5) {
     		// set the motor speed
-//    		if(is_stm_controlled == 1){
-//				motor_speed = UART_rx_buffer[1];
-//				if(motor_speed > 200){
-//					motor_speed = 0; //could probably get rid of this.
-//				} else {
-//					//move motor. Be sure to ask
-//					direction = UART_rx_buffer[2];
-//					motor_go(motor_speed, direction);
-//				}
-//    		}
+    		if(is_stm_controlled == 0){
+				motor_speed = UART_rx_buffer[1];
+				if(motor_speed > 200){
+					motor_speed = 0; //could probably get rid of this.
+				} else {
+					//move motor. Be sure to ask
+					direction = UART_rx_buffer[2];
+					motor_go(motor_speed, direction);
+				}
+    		}
 
-    		UART_PutStr("Hello from 5\0");
+    		//UART_PutStr("Hello from 5\0");
     	} else if(UART_rx_buffer[0] == 6) {
     		//reset method goes here.
-    		//reset_motor();
-    		UART_PutStr("Hello from 6\0");
+    		reset_motor();
+    		//UART_PutStr("Hello from 6\0");
     	} else if(UART_rx_buffer[0] == 7) {
     		//set a stop command.
-    		//motor_stop();
+    		motor_stop();
 
-    		UART_PutStr("Hello from 7\0");
+    		//UART_PutStr("Hello from 7\0");
     	} else {
     		//no-op
     	}
@@ -177,7 +183,7 @@ void USART2_IRQHandler(void)
     if(UART_rx_counter == 3){
     	UART_rx_counter = 0;
     } else {
-    	GPIOC->ODR ^= GPIO_ODR_9;
+    	//GPIOC->ODR ^= GPIO_ODR_9;
     	UART_rx_counter ++;
     }
 

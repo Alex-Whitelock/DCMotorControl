@@ -46,6 +46,9 @@ void set_initial_target_rpm(int16_t);
 // Sets up the entire motor drive system
 void motor_init(void);
 
+//calibrates the motor to put the gear position at 0
+void calibrate(void);
+
 // Set the duty cycle of the PWM, accepts (0-100)
 void pwm_setDutyCycle(uint8_t duty);
 

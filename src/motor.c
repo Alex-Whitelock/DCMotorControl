@@ -245,7 +245,54 @@ void pwm_setDutyCycle(uint8_t duty) {
     }
 }
 
+void calibrate(){
+
+	volatile slot= (GPIOA->ODR >> 10) & 0x1;
+
+	if(slot){
+		gear_position = 0;
+	} else {
+		if(gear_position < 6400) {
+			motor_go(10, 1);
+		} else {
+			motor_go(10, 0);
+		}
+		while(!slot){
+			slot = (GPIOA->ODR >> 10) & 0x1;
+		}
+
+		motor_stop();
+		gear_position = 0;
+
+	}
+
+
+}
+
 void go_to_quadrant(uint8_t quadrant){
+	int16_t quadrant_ticks = quadrant * 1600;//This gives the gear position we are looking for.
+	int16_t to_move = gear_position - quadrant_ticks;
+
+	if(to_move > 0) {
+		if(to_move > 6400) {
+			to_move = 12800 - to_move;
+			move_motor(to_move,1);
+		}else{
+			move_motor(to_move, 0);
+		}
+	} else if(to_move < 0) {
+		to_move = (~to_move) + 1;
+		if(to_move > 6400) {
+			to_move = 12800 - to_move;
+			move_motor(to_move,0);
+		} else {
+			move_motor(to_move, 1);
+		}
+
+	} else {
+		//no-op
+	}
+
 
 }
 

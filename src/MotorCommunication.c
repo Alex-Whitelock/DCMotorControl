@@ -80,6 +80,7 @@ void USART2_IRQHandler(void)
 	uint16_t encoder_ticks_low =0;
 	uint8_t direction = 0;
 	uint8_t is_motor_go =0;
+	uint8_t quadrant = 0;
 	uint8_t motor_speed =0;
 	uint8_t is_motor_stop = 0;
 	uint8_t pir_information = 0;
@@ -152,12 +153,12 @@ void USART2_IRQHandler(void)
     	} else if(UART_rx_buffer[0] == 5) {
     		// set the motor speed
     		if(is_stm_controlled == 0){
-				motor_speed = UART_rx_buffer[1];
+				motor_speed = UART_rx_buffer[1] & 0xff;
 				if(motor_speed > 200){
 					motor_speed = 0; //could probably get rid of this.
 				} else {
 					//move motor. Be sure to ask
-					direction = UART_rx_buffer[2];
+					direction = UART_rx_buffer[2] & 0xff;
 					motor_go(motor_speed, direction);
 				}
     		}
@@ -165,7 +166,18 @@ void USART2_IRQHandler(void)
     		//UART_PutStr("Hello from 5\0");
     	} else if(UART_rx_buffer[0] == 6) {
     		//reset method goes here.
-    		reset_motor();
+    		if(is_stm_controlled == 0){
+    			if(UART_rx_buffer[2] == 1){
+    				reset_motor();
+    			} else if(UART_rx_buffer[2] == 0){
+    				quadrant = UART_rx_buffer[1];
+    				go_to_quadrant(quadrant);
+
+    			} else{
+    				//no-op
+    			}
+
+    		}
     		//UART_PutStr("Hello from 6\0");
     	} else if(UART_rx_buffer[0] == 7) {
     		//set a stop command.

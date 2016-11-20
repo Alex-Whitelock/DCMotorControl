@@ -62,7 +62,6 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 
 	target_rpm = 0;
-	delay_ms(500);
 	motor_ticks = 0;// intitialize the motor ticks to 0.
 	dir = _dir;//set the global direction to the new one.
 
@@ -128,7 +127,7 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 	target_rpm = 0;
 	apply_electronic_break();
-	delay_ms(1000);//wait a second.
+	delay_ms(500);//wait a second.
 		if(dir == 0){
 				dir = 1;
 				GPIOC->ODR &= ~(1 << 11);  // Set PA4 to low
@@ -272,36 +271,39 @@ void calibrate(){
 void go_to_quadrant(uint8_t quadrant){
 	int16_t quadrant_ticks = quadrant * 1600;//This gives the gear position we are looking for.
 	int16_t to_move = gear_position - quadrant_ticks;
-
-	if(to_move > 0) {
-		if(to_move > 6400) {
-			to_move = 12800 - to_move;
-			move_motor(to_move,1);
-		}else{
-			move_motor(to_move, 0);
-		}
-	} else if(to_move < 0) {
-		to_move = (~to_move) + 1;
-		if(to_move > 6400) {
-			to_move = 12800 - to_move;
-			move_motor(to_move,0);
-		} else {
-			move_motor(to_move, 1);
-		}
-
-	} else {
-		//no-op
+	if((quadrant > 7) || (quadrant < 0)) {
+		return;
 	}
 
+	//First check to see if this is Case I or Case II
 
+	int aTicks = -1;
+	int bTicks = -1;
+	if (gear_position < quadrant_ticks) {
+		//Case I
+		//Calculate both paths
+		aTicks = gear_position + (12799 - quadrant_ticks);
+		bTicks = quadrant_ticks - gear_position;
+
+
+	} else {
+		//case II
+		aTicks = gear_position - quadrant_ticks;
+		bTicks = (12799 - gear_position) + quadrant_ticks;
+
+	}
+	if (aTicks > bTicks) {
+
+		move_motor(bTicks,0);
+	} else {
+
+		move_motor(aTicks,1);
+	}
 }
 
 void reset_motor(){
 
-	if(gear_position != 0){
-		//will need to experiment with the motor direction to ensure that I get to the right motor position.
-		move_motor(gear_position, 0);
-	}
+	go_to_quadrant(0);
 
 }
 

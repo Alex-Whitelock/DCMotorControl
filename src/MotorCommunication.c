@@ -43,6 +43,8 @@ void UART_Init(uint32_t speed){
 	GPIOA-> MODER |= 1<<29; //ENABLE PA14 For alternate function mode.
 	GPIOA-> MODER |= 1<<31;//ENABLE PA15 for alternate function mode.
 
+	GPIOA->PUPDR |= (2<<28); //set pa14 into pull down mode so pi doesn't get random interupts.
+
 	//GPIOA->AFR[0] |= (1<<8);//choose AF1 for pin 2
 	//GPIOA ->AFR[0] |= (1<<12);//choose af1 for pin 3
 
@@ -106,8 +108,8 @@ void USART2_IRQHandler(void)
     		pir_information = get_pir_information();
     		instruction[0] = 1;
     		instruction[1] = pir_information;
-    		instruction[2] = 0;
-    		instruction[3] = 0;
+    		instruction[2] = (gear_position>>8) & 0xff;
+    		instruction[3] = gear_position & 0xff;
     		instruction[4] = '\0';
 
     		UART_PutStr(instruction);
@@ -117,6 +119,7 @@ void USART2_IRQHandler(void)
     	} else if(UART_rx_buffer[0] == 2) {
     		//transfer total control to pi. Ensure that the  motor does not turn due to
     		//pir sensors.
+    		isArmed = 0;
     		is_stm_controlled = 0;//make it so that the stm is not controlled.
     		//UART_PutStr("Hello from 2\0");
 
@@ -138,7 +141,7 @@ void USART2_IRQHandler(void)
     		instruction[3] = 0;
     		instruction[4] = '\0';
 
-    		//This tell the pi that it now has control of the pi again.
+    		//This tell the pi that it now has control of the motor again.
     		UART_PutStr(instruction);
 
 
@@ -170,12 +173,19 @@ void USART2_IRQHandler(void)
     			if(UART_rx_buffer[2] == 1){
     				reset_motor();
     			} else if(UART_rx_buffer[2] == 0){
-    				quadrant = UART_rx_buffer[1];
+    				quadrant = UART_rx_buffer[1] & 0xff;
     				go_to_quadrant(quadrant);
 
     			} else{
     				//no-op
     			}
+    			instruction[0] = 2;
+				instruction[1] = 0;
+				instruction[2] = 0;
+				instruction[3] = 0;
+				instruction[4] = '\0';
+
+				UART_PutStr(instruction); // Put the strin
 
     		}
     		//UART_PutStr("Hello from 6\0");

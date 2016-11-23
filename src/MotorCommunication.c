@@ -86,7 +86,10 @@ void USART2_IRQHandler(void)
 	uint8_t motor_speed =0;
 	uint8_t is_motor_stop = 0;
 	uint8_t pir_information = 0;
-	char instruction[5];
+	uint8_t gear_high = 0;
+	uint8_t gear_low = 0;
+	uint8_t isLastZero = 1;
+	char instruction[6];
 
 	//int i;
 	//char armedReceive [40];
@@ -106,11 +109,27 @@ void USART2_IRQHandler(void)
     	if(UART_rx_buffer[0] == 1) {
     		//ask for pir information.
     		pir_information = get_pir_information();
+    		gear_high = (gear_position>>8) & 0xff;
+    		gear_low = gear_position & 0xff;
+
     		instruction[0] = 1;
-    		instruction[1] = pir_information;
-    		instruction[2] = (gear_position>>8) & 0xff;
-    		instruction[3] = gear_position & 0xff;
-    		instruction[4] = '\0';
+
+    		if(pir_information == 0){
+    			pir_information = 0xff;
+    			instruction[1] = pir_information;
+    		} else
+    			instruction[1] = pir_information;
+    		if(gear_high == 0){
+    			instruction[2] = 0xff;
+    		} else
+    			instruction[2] = gear_position;
+    		if(gear_low == 0) {
+    			instruction[3] = 0xff;
+    			instruction[4] = 0x02;
+    		} else{
+    			instruction[3] = gear_low;
+    			instruction[4] = 0x01; //Tell the pi that it is 255 instead of zero.
+    		}
 
     		UART_PutStr(instruction);
 
@@ -136,10 +155,12 @@ void USART2_IRQHandler(void)
     		}
 
     		instruction[0] = 2;
-    		instruction[1] = 0;
-    		instruction[2] = 0;
-    		instruction[3] = 0;
-    		instruction[4] = '\0';
+    		instruction[1] = 0xff;
+    		instruction[2] = 0xff;
+    		instruction[3] = 0xff;
+    		instruction[4] = 0x02;
+
+    		//tell the stm that the last value is 0 not 255 doesn't really matter for this instruction though
 
     		//This tell the pi that it now has control of the motor again.
     		UART_PutStr(instruction);
@@ -180,10 +201,11 @@ void USART2_IRQHandler(void)
     				//no-op
     			}
     			instruction[0] = 2;
-				instruction[1] = 0;
-				instruction[2] = 0;
-				instruction[3] = 0;
-				instruction[4] = '\0';
+				instruction[1] = 0xff;
+				instruction[2] = 0xff;
+				instruction[3] = 0xff;
+				instruction[4] = 0x02;
+
 
 				UART_PutStr(instruction); // Put the strin
 

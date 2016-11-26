@@ -131,6 +131,7 @@ void USART2_IRQHandler(void)
     			instruction[4] = 0x01; //Tell the pi that it is 255 instead of zero.
     		}
 
+    		instruction[5] = '\0';
     		UART_PutStr(instruction);
 
     		//UART_PutStr("Hello from 1\0");
@@ -159,7 +160,7 @@ void USART2_IRQHandler(void)
     		instruction[2] = 0xff;
     		instruction[3] = 0xff;
     		instruction[4] = 0x02;
-
+    		instruction[5] = '\0';
     		//tell the stm that the last value is 0 not 255 doesn't really matter for this instruction though
 
     		//This tell the pi that it now has control of the motor again.
@@ -205,6 +206,7 @@ void USART2_IRQHandler(void)
 				instruction[2] = 0xff;
 				instruction[3] = 0xff;
 				instruction[4] = 0x02;
+				instruction[5] = '\0';
 
 
 				UART_PutStr(instruction); // Put the strin
@@ -224,7 +226,7 @@ void USART2_IRQHandler(void)
 
 
 
-    if(UART_rx_counter == 3){
+    if(UART_rx_counter >= 3){
     	UART_rx_counter = 0;
     } else {
     	//GPIOC->ODR ^= GPIO_ODR_9;

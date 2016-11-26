@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
 
 
     motor_init();                           // Initialize motor code
-    UART_Init(9600);						// Initialize the UART communication for the motor and other stuff in the future.
+    UART_Init(115200);						// Initialize the UART communication for the motor and other stuff in the future.
     while (1) {
 
 
@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
 
 
 
-        GPIOC->ODR ^= GPIO_ODR_8;           // Toggle green LED (heartbeat)
+        GPIOC->ODR ^= GPIO_ODR_8;           // Toggle blue LED (heartbeat)
         //encoder_count = TIM2->CNT;
         delay_ms(128);                      // Delay 1/8 second
     }

@@ -64,6 +64,22 @@ void motion_init(){
 
 }
 
+uint8_t get_pir_information(){
+	int northSensor = ((GPIOB -> IDR)>>4)&1;
+	int eastSensor = ((GPIOB -> IDR)>>5)&1;
+	int southSensor = ((GPIOB -> IDR)>>6)&1;
+	int westSensor = ((GPIOB -> IDR)>>7)&1;
+
+	uint8_t pirInformation =0;
+	pirInformation = pirInformation | northSensor;
+	pirInformation = (pirInformation << 1) | eastSensor;
+	pirInformation = (pirInformation << 1) | southSensor;
+	pirInformation = (pirInformation << 1) |westSensor;
+
+	return pirInformation;
+
+}
+
 //This method senses motions and moves the motor accordingly to the right position from wherever it's last postion was
 
 void sense_motion(){
@@ -114,29 +130,29 @@ void sense_motion(){
     else if(eastSensor && southSensor){
 
     			if(MOTOR_POSITION==NORTH){
-    	    		move_motor(4800,0);
+    	    		move_motor(4800,1);
 
 
     	    	}
     	    	else if(MOTOR_POSITION == NORTH_EAST){
-    	    		move_motor(3200,0);
+    	    		move_motor(3200,1);
     	    	}
     	    	else if(MOTOR_POSITION==EAST){
-    	    		move_motor(1600,0);//move it counter clock wise
+    	    		move_motor(1600,1);//move it counter clock wise
     	    	}
     	    	else if(MOTOR_POSITION==SOUTH_EAST){
     	    		//do nothing
     	    	}
     	    	else if(MOTOR_POSITION==SOUTH){
-    	    		move_motor(1600,1);
+    	    		move_motor(1600,0);
     	    	}
     	    	else if(MOTOR_POSITION==SOUTH_WEST)
-    	    		move_motor(3200,1);
+    	    		move_motor(3200,0);
     	    	else if(MOTOR_POSITION==WEST){
-    	    		move_motor(4800,1);
+    	    		move_motor(4800,0);
     	    	}
     	    	else if(MOTOR_POSITION==NORTH_WEST)
-    	    		move_motor(6400,0);
+    	    		move_motor(6400,1);
 
     		MOTOR_POSITION=SOUTH_EAST;
 
@@ -144,30 +160,30 @@ void sense_motion(){
     else if(westSensor && southSensor){
 
     			if(MOTOR_POSITION==NORTH){
-    	    		move_motor(600,1);
+    	    		move_motor(600,0);
 
 
     	    	}
     	    	else if(MOTOR_POSITION == NORTH_EAST){
-    	    		move_motor(6400,0);
+    	    		move_motor(6400,1);
     	    	}
     	    	else if(MOTOR_POSITION==EAST){
-    	    		move_motor(4800,0);//move it counter clock wise
+    	    		move_motor(4800,1);//move it counter clock wise
     	    	}
     	    	else if(MOTOR_POSITION==SOUTH_EAST){
-    	    		move_motor(3200,0);
+    	    		move_motor(3200,1);
     	    	}
     	    	else if(MOTOR_POSITION==SOUTH){
-    	    		move_motor(1600,0);
+    	    		move_motor(1600,1);
     	    	}
     	    	else if(MOTOR_POSITION==SOUTH_WEST){
     	    		//move_motor(400,1);
     	    	}
     	    	else if(MOTOR_POSITION==WEST){
-    	    		move_motor(1600,1);
+    	    		move_motor(1600,0);
     	    	}
     	    	else if(MOTOR_POSITION==NORTH_WEST)
-    	    		move_motor(3200,1);
+    	    		move_motor(3200,0);
 
     		MOTOR_POSITION=SOUTH_WEST;
 
@@ -175,28 +191,28 @@ void sense_motion(){
     else if(westSensor && northSensor){
 
     			if(MOTOR_POSITION==NORTH){
-    	    		move_motor(1600,1);
+    	    		move_motor(1600,0);
 
 
     	    	}
     	    	else if(MOTOR_POSITION == NORTH_EAST){
-    	    		move_motor(3200,1);
+    	    		move_motor(3200,0);
     	    	}
     	    	else if(MOTOR_POSITION==EAST){
-    	    		move_motor(4800,1);//move it counter clock wise
+    	    		move_motor(4800,0);//move it counter clock wise
     	    	}
     	    	else if(MOTOR_POSITION==SOUTH_EAST){
-    	    		move_motor(6400,0);
+    	    		move_motor(6400,1);
     	    	}
     	    	else if(MOTOR_POSITION==SOUTH){
-    	    		move_motor(4800,0);
+    	    		move_motor(4800,1);
     	    	}
     	    	else if(MOTOR_POSITION==SOUTH_WEST){
     	    		//move_motor(400,1);
-    	    		move_motor(3200,0);
+    	    		move_motor(3200,1);
     	    	}
     	    	else if(MOTOR_POSITION==WEST){
-    	    		move_motor(200,0);
+    	    		move_motor(1600,1);
     	    	}
     	    	else if(MOTOR_POSITION==NORTH_WEST){
     	    		//do nothing.

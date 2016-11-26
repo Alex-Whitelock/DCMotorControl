@@ -32,6 +32,7 @@ volatile int8_t overshot;
 volatile int8_t dir;
 volatile int16_t motor_ticks;
 volatile int16_t halved_ticks; //This is a havled ticks value to know when to decrease the value of the encoder ticks.
+volatile int16_t gear_position;
             // Integral gain
 
 
@@ -44,6 +45,9 @@ void set_initial_target_rpm(int16_t);
 
 // Sets up the entire motor drive system
 void motor_init(void);
+
+//calibrates the motor to put the gear position at 0
+void calibrate(void);
 
 // Set the duty cycle of the PWM, accepts (0-100)
 void pwm_setDutyCycle(uint8_t duty);
@@ -59,6 +63,11 @@ void motor_go(uint8_t _target_rpm, uint8_t _dir);
 //Simply sets the target rpm of the motor down to zero.
 void motor_stop();
 
+//reset the motor back to north position.
+void reset_motor();
+
+//Sets the muzzle of the turret in the quadrant specified
+void go_to_quadrant(uint8_t quadrant);
 
 
 /* -------------------------------------------------------------------------------------------------------------

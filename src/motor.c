@@ -17,6 +17,7 @@ volatile uint8_t Ki=1;    // Set default integral gain
 
 // Sets up the entire motor drive system
 void motor_init(void) {
+	gear_position = 0;
     pwm_init();
     encoder_init();
     ADC_init();
@@ -61,7 +62,6 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 
 	target_rpm = 0;
-	delay_ms(500);
 	motor_ticks = 0;// intitialize the motor ticks to 0.
 	dir = _dir;//set the global direction to the new one.
 
@@ -127,7 +127,7 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 	target_rpm = 0;
 	apply_electronic_break();
-	delay_ms(1000);//wait a second.
+	delay_ms(500);//wait a second.
 		if(dir == 0){
 				dir = 1;
 				GPIOC->ODR &= ~(1 << 11);  // Set PA4 to low
@@ -242,6 +242,69 @@ void pwm_setDutyCycle(uint8_t duty) {
         TIM14->CCR1 = ((uint32_t)duty*TIM14->ARR)/100;  // Use linear transform to produce CCR1 value
         // (CCR1 == "pulse" parameter in PWM struct used by peripheral library)
     }
+}
+
+void calibrate(){
+
+	volatile slot= (GPIOA->ODR >> 10) & 0x1;
+
+	if(slot){
+		gear_position = 0;
+	} else {
+		if(gear_position < 6400) {
+			motor_go(10, 1);
+		} else {
+			motor_go(10, 0);
+		}
+		while(!slot){
+			slot = (GPIOA->ODR >> 10) & 0x1;
+		}
+
+		motor_stop();
+		gear_position = 0;
+
+	}
+
+
+}
+
+void go_to_quadrant(uint8_t quadrant){
+	int16_t quadrant_ticks = quadrant * 1600;//This gives the gear position we are looking for.
+	int16_t to_move = gear_position - quadrant_ticks;
+	if((quadrant > 7) || (quadrant < 0)) {
+		return;
+	}
+
+	//First check to see if this is Case I or Case II
+
+	int aTicks = -1;
+	int bTicks = -1;
+	if (gear_position < quadrant_ticks) {
+		//Case I
+		//Calculate both paths
+		aTicks = gear_position + (12799 - quadrant_ticks);
+		bTicks = quadrant_ticks - gear_position;
+
+
+	} else {
+		//case II
+		aTicks = gear_position - quadrant_ticks;
+		bTicks = (12799 - gear_position) + quadrant_ticks;
+
+	}
+	if (aTicks > bTicks) {
+
+		move_motor(bTicks,0);
+	} else {
+
+		move_motor(aTicks,1);
+	}
+}
+
+void reset_motor(){
+
+	go_to_quadrant(0);
+
 }
 
 // Sets up encoder interface to read motor speed
@@ -369,7 +432,12 @@ void PI_update(void) {
 		motor_ticks = motor_ticks + motor_speed;
 		halved_ticks = halved_ticks + motor_speed;
 
+		gear_position = gear_position + motor_speed;// ad the moto speed
 
+		if(gear_position < 0){
+			gear_position = 12800 - ((~gear_position)+1);
+		}
+		gear_position = gear_position % 12800;
 
 
     /* Hint: Remember that your calculated motor speed may not be directly in RPM!

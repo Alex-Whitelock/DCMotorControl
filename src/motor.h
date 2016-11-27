@@ -41,6 +41,8 @@ volatile int16_t gear_position;
  * -------------------------------------------------------------------------------------------------------------
  */
 
+void pi_move_motor(int16_t _encoder_ticks, uint8_t _speed, uint8_t _dir);
+
 void set_initial_target_rpm(int16_t);
 
 // Sets up the entire motor drive system

@@ -168,6 +168,52 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 }
 
+void pi_move_motor(int16_t encoder_ticks, uint8_t _speed, uint8_t _dir){
+
+	target_rpm = 0;
+	motor_ticks = 0;// intitialize the motor ticks to 0.
+	dir = _dir;//set the global direction to the new one.
+
+	if(dir == 0){
+		GPIOC->ODR |= (1 << 11);  // Set PA4 to high
+		GPIOC->ODR &= ~(1 << 12); // Set PA5 to low
+
+	}
+	else{
+		GPIOC->ODR &= ~(1 << 11);  // Set PA4 to low
+		GPIOC->ODR |= (1 << 12); // Set PA5 to high
+	}
+
+	if(_speed > 200) {
+		target_rpm = 200;
+	} else
+		target_rpm = _speed;
+
+	overshot = 0;
+		while(!overshot){
+
+			if(dir == 0){
+
+				if(motor_ticks >= (encoder_ticks)){
+					overshot = 1;
+				}
+
+			}
+			else{
+
+				if((~(motor_ticks)+1) >= encoder_ticks){
+					overshot = 1;
+				}
+			}
+		}
+
+
+	apply_electronic_break();
+
+
+
+}
+
 void set_initial_target_rpm(int16_t encoder_ticks){
 	if(encoder_ticks > 6400){
 		target_rpm = max_rpm;
@@ -375,6 +421,8 @@ void TIM6_DAC_IRQHandler(void) {
 
     TIM6->SR &= ~TIM_SR_UIF;        // Acknowledge the interrupt
 }
+
+
 
 void ADC_init(void) {
 

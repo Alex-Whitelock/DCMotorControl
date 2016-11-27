@@ -91,6 +91,10 @@ void USART2_IRQHandler(void)
 	uint8_t isLastZero = 1;
 	char instruction[6];
 
+
+	NVIC_DisableIRQ(USART2_IRQn);
+
+
 	//int i;
 	//char armedReceive [40];
   if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
@@ -103,7 +107,7 @@ void USART2_IRQHandler(void)
 
 
     //Once we get to this part we need to decide which kind of instruction we are doing.
-    if(UART_rx_counter == 3){
+    if(UART_rx_counter == 4){
 
     	GPIOC->ODR ^= GPIO_ODR_9;
     	if(UART_rx_buffer[0] == 1) {
@@ -218,6 +222,19 @@ void USART2_IRQHandler(void)
     		motor_stop();
 
     		//UART_PutStr("Hello from 7\0");
+    	} else if(UART_rx_buffer[0] == 8) {
+    		if(is_stm_controlled == 0) {
+
+    			if(is_stm_controlled == 0){
+					encoder_ticks_high = UART_rx_buffer[1] & 0xff;
+					encoder_ticks_low = UART_rx_buffer[2] & 0xff;
+					encoder_ticks = (encoder_ticks_high << 8) | encoder_ticks_low;
+					direction = UART_rx_buffer[4] & 0x1;
+					motor_speed = UART_rx_buffer[3] & 0xff;
+    			}
+
+				pi_move_motor(encoder_ticks, motor_speed, direction);
+    		}
     	} else {
     		//no-op
     	}
@@ -226,12 +243,15 @@ void USART2_IRQHandler(void)
 
 
 
-    if(UART_rx_counter >= 3){
+    if(UART_rx_counter >= 4){
     	UART_rx_counter = 0;
     } else {
     	//GPIOC->ODR ^= GPIO_ODR_9;
     	UART_rx_counter ++;
     }
+
+    NVIC_EnableIRQ(USART2_IRQn);
+    NVIC_SetPriority(USART2_IRQn, 2);
 
 
 		/* if the last character received is the LF ('\r' or 0x0a) character OR if the UART_RX_BUFFER_LENGTH (40) value has been reached ...*/

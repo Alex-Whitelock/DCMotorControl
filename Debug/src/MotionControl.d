@@ -28,7 +28,8 @@ src/MotionControl.o: ../src/MotionControl.c \
  ../system/include/stm32f0-stdperiph/stm32f0xx_usart.h \
  ../system/include/stm32f0-stdperiph/stm32f0xx_wwdg.h \
  ../system/include/stm32f0-stdperiph/stm32f0xx_misc.h \
- ../src/MotionControl.h ../src/motor.h ../src/delay.h
+ ../src/MotionControl.h ../src/MotorCommunication.h ../src/motor.h \
+ ../src/delay.h
 
 ../system/include/diag/Trace.h:
 
@@ -93,6 +94,8 @@ src/MotionControl.o: ../src/MotionControl.c \
 ../system/include/stm32f0-stdperiph/stm32f0xx_misc.h:
 
 ../src/MotionControl.h:
+
+../src/MotorCommunication.h:
 
 ../src/motor.h:
 

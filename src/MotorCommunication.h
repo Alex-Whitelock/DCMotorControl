@@ -18,6 +18,7 @@ void UART_Init(uint32_t speed);
 
 volatile int isArmed;
 volatile int is_stm_controlled;
+volatile int is_in_ScanningMode;
 void UART_PutChar(unsigned char c);
 void UART_PutStr(char *str);
 void UART_ClearRxBuffer(void);
@@ -27,6 +28,9 @@ void UART_ClearRxBuffer(void);
 uint8_t UART_SetName(char *name);
 uint8_t UART_SetPin(char *pin);
 void UART_Delay(uint32_t delay);
+void set_STM_cotrolled(uint8_t set);
+
+
 
 
 

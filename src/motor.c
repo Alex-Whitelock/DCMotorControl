@@ -168,6 +168,53 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 }
 
+void pi_move_motor(int16_t encoder_ticks, uint8_t _speed, uint8_t _dir){
+
+	target_rpm = 0;
+	motor_ticks = 0;// Initialize the motor ticks to 0.
+	dir = _dir;//set the global direction to the new one.
+
+	if(dir == 0){
+		GPIOC->ODR |= (1 << 11);  // Set PA4 to high
+		GPIOC->ODR &= ~(1 << 12); // Set PA5 to low
+
+	}
+	else{
+		GPIOC->ODR &= ~(1 << 11);  // Set PA4 to low
+		GPIOC->ODR |= (1 << 12); // Set PA5 to high
+	}
+
+	if(_speed > 200) {
+		target_rpm = 200;
+	} else
+		target_rpm = _speed;
+
+	overshot = 0;
+		while(!overshot){
+
+			if(dir == 0){
+
+				if(motor_ticks >= (encoder_ticks)){
+					overshot = 1;
+				}
+
+			}
+			else{
+
+				if((~(motor_ticks)+1) >= encoder_ticks){
+					overshot = 1;
+				}
+			}
+		}
+	target_rpm = 0;
+
+
+	apply_electronic_break();
+
+
+
+}
+
 void set_initial_target_rpm(int16_t encoder_ticks){
 	if(encoder_ticks > 6400){
 		target_rpm = max_rpm;
@@ -186,10 +233,8 @@ void set_initial_target_rpm(int16_t encoder_ticks){
 }
 
 void apply_electronic_break(void){
-
-			GPIOC ->ODR |= (1<<11);  //Set PA4 to high to set direction pins to same high value.
-			GPIOC->ODR |= (1 << 12);
-
+	GPIOC ->ODR |= (1<<11);  //Set PA4 to high to set direction pins to same high value.
+	GPIOC->ODR |= (1 << 12);
 }
 
 
@@ -246,7 +291,7 @@ void pwm_setDutyCycle(uint8_t duty) {
 
 void calibrate(){
 
-	volatile slot= (GPIOA->ODR >> 10) & 0x1;
+	volatile uint8_t slot= (GPIOA->ODR >> 10) & 0x1;
 
 	if(slot){
 		gear_position = 0;
@@ -375,6 +420,8 @@ void TIM6_DAC_IRQHandler(void) {
 
     TIM6->SR &= ~TIM_SR_UIF;        // Acknowledge the interrupt
 }
+
+
 
 void ADC_init(void) {
 

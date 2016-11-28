@@ -15,6 +15,7 @@ uint8_t UART_rx_counter = 0; 																				//used by the IRQ handler
 char UART_msg[UART_RX_BUFFER_LENGTH];																//variable that contains the latest string received on the RX pin
 uint8_t new_UART_msg = 0;
 uint8_t *transmitBuffer;
+uint8_t priorityLevel = 2;
 
 
 void UART_Init(uint32_t speed){
@@ -27,14 +28,15 @@ void UART_Init(uint32_t speed){
 						- No parity
 						- Hardware flow control disabled (RTS and CTS signals)
 						- Receive and transmit enabled
-			*/
+	*/
 	isArmed = 0;
 	is_stm_controlled = 0;
+	is_in_ScanningMode = 1;//Start in scanning mode.
 
 	RCC->AHBENR|=RCC_AHBENR_GPIOAEN;
 	RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
 	USART2->CR1 =0;//RESET AND ENSURE THAT WE  are working with 8 bits
-	//aslso pairty control is disabled. and in even parity
+	//also parity control is disabled. and in even parity
 		//PA3_is the usart2_RX data input
 		//PA2 is the usart2_TX data output
 	//GPIOA->MODER |= 1<<5;//Enable 2 for alternate function mode for e pa2
@@ -59,12 +61,10 @@ void UART_Init(uint32_t speed){
 	USART2->CR1|=USART_CR1_TE;//transmitter enable
 	USART2->CR1|=USART_CR1_UE;//usart enable
 
-
 	USART2->BRR = SystemCoreClock/speed;
 
-
 	NVIC_EnableIRQ(USART2_IRQn);
-	NVIC_SetPriority(USART2_IRQn, 2); // Set to medium priority
+	NVIC_SetPriority(USART2_IRQn, priorityLevel); // Set to medium priority
 	//isArmed=0;
 	//is_stm_controlled = 1; //When the stm board is turned on the initial stm control should be turned on.
 
@@ -73,41 +73,30 @@ void UART_Init(uint32_t speed){
 //This is the interupt handler for the USART
 void USART2_IRQHandler(void)
 {
-//	int x;
-
-	//int i;
-
 	uint16_t  encoder_ticks = 0;
 	uint8_t encoder_ticks_high = 0;
 	uint16_t encoder_ticks_low =0;
 	uint8_t direction = 0;
-	uint8_t is_motor_go =0;
 	uint8_t quadrant = 0;
 	uint8_t motor_speed =0;
-	uint8_t is_motor_stop = 0;
 	uint8_t pir_information = 0;
 	uint8_t gear_high = 0;
 	uint8_t gear_low = 0;
-	uint8_t isLastZero = 1;
-	char instruction[6];
+	char instruction[12];
 
-	//int i;
-	//char armedReceive [40];
+	NVIC_DisableIRQ(USART2_IRQn);
+
   if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
   {
 		/* Read one byte from the receive data register */
     UART_rx_buffer[UART_rx_counter] = USART_ReceiveData(USART2);
 
-
-    //Most of this code will have to be changed once w
-
-
     //Once we get to this part we need to decide which kind of instruction we are doing.
-    if(UART_rx_counter == 3){
+    if(UART_rx_counter == 4){
 
     	GPIOC->ODR ^= GPIO_ODR_9;
-    	if(UART_rx_buffer[0] == 1) {
-    		//ask for pir information.
+    	if(UART_rx_buffer[0] == 1){
+    		//ask for PIR information.
     		pir_information = get_pir_information();
     		gear_high = (gear_position>>8) & 0xff;
     		gear_low = gear_position & 0xff;
@@ -122,7 +111,7 @@ void USART2_IRQHandler(void)
     		if(gear_high == 0){
     			instruction[2] = 0xff;
     		} else
-    			instruction[2] = gear_position;
+    			instruction[2] = gear_high;
     		if(gear_low == 0) {
     			instruction[3] = 0xff;
     			instruction[4] = 0x02;
@@ -141,16 +130,17 @@ void USART2_IRQHandler(void)
     		//pir sensors.
     		isArmed = 0;
     		is_stm_controlled = 0;//make it so that the stm is not controlled.
+    		set_STM_cotrolled(0);
     		//UART_PutStr("Hello from 2\0");
 
     	} else if(UART_rx_buffer[0] == 3) {
     		//This will move the motor.
     		if(is_stm_controlled == 0){
+    			encoder_ticks = 0;//Zero out the encoder_ticks to prep for bit manipulation
     			encoder_ticks_high = UART_rx_buffer[1] & 0xff;
     			encoder_ticks_low = UART_rx_buffer[2] & 0xff;
     			encoder_ticks = (encoder_ticks_high << 8) | encoder_ticks_low;
     			direction = UART_rx_buffer[3];
-
 
     			move_motor(encoder_ticks, direction);
     		}
@@ -166,13 +156,12 @@ void USART2_IRQHandler(void)
     		//This tell the pi that it now has control of the motor again.
     		UART_PutStr(instruction);
 
-
     		//UART_PutStr("Hello from 3\0");
 
     	} else if(UART_rx_buffer[0] == 4) {
     		//transfer total control from pi to stm.
-    		isArmed =1;
-    		is_stm_controlled = 1;
+
+    		set_STM_cotrolled(1);
 
     		//UART_PutStr("Hello from 4\0");
     	} else if(UART_rx_buffer[0] == 5) {
@@ -201,6 +190,7 @@ void USART2_IRQHandler(void)
     			} else{
     				//no-op
     			}
+
     			instruction[0] = 2;
 				instruction[1] = 0xff;
 				instruction[2] = 0xff;
@@ -218,6 +208,30 @@ void USART2_IRQHandler(void)
     		motor_stop();
 
     		//UART_PutStr("Hello from 7\0");
+    	} else if(UART_rx_buffer[0] == 8) {
+    		if(is_stm_controlled == 0) {
+
+    			if(is_stm_controlled == 0){
+					encoder_ticks_high = UART_rx_buffer[1] & 0xff;
+					encoder_ticks_low = UART_rx_buffer[2] & 0xff;
+					encoder_ticks = (encoder_ticks_high << 8) | encoder_ticks_low;
+					direction = UART_rx_buffer[4] & 0x1;
+					motor_speed = UART_rx_buffer[3] & 0xff;
+					pi_move_motor(encoder_ticks, motor_speed, direction);
+    			}
+
+
+
+				instruction[0] = 2;
+				instruction[1] = 0xff;
+				instruction[2] = 0xff;
+				instruction[3] = 0xff;
+				instruction[4] = 0x02;
+				instruction[5] = '\0';
+
+				UART_PutStr(instruction); // Put the strin
+
+    		}
     	} else {
     		//no-op
     	}
@@ -226,12 +240,15 @@ void USART2_IRQHandler(void)
 
 
 
-    if(UART_rx_counter >= 3){
+    if(UART_rx_counter >= 4){
     	UART_rx_counter = 0;
     } else {
     	//GPIOC->ODR ^= GPIO_ODR_9;
     	UART_rx_counter ++;
     }
+
+    NVIC_EnableIRQ(USART2_IRQn);
+    NVIC_SetPriority(USART2_IRQn, priorityLevel);
 
 
 		/* if the last character received is the LF ('\r' or 0x0a) character OR if the UART_RX_BUFFER_LENGTH (40) value has been reached ...*/
@@ -251,6 +268,16 @@ void USART2_IRQHandler(void)
   }
 }
 
+void set_STM_cotrolled(uint8_t set){
+	if(set == 1){
+		isArmed = 1;
+		is_stm_controlled = 1;
+	} else if( set ==0) {
+		isArmed =0;
+		is_stm_controlled = 0;
+	}
+}
+
 //used to send a string of information
 void UART_PutStr(char *str)
 {
@@ -260,7 +287,7 @@ void UART_PutStr(char *str)
 	{
 		UART_PutChar(str[i]);
 		i++;
-	}while(str[i]!='\0');
+	}while(str[i]!='\0'); //Wait  <-- this is why you can't use Zeros? if all instructions are set at 5 or 4 bytes as they were why not just loop that known amount of times??
 }
 
 
@@ -268,7 +295,7 @@ void UART_PutStr(char *str)
 //used to send characters
 void UART_PutChar(unsigned char ch)
 {
-	/* Put character on the serial line */ //I don't know if this will wrk
+	/* Put character on the serial line */ //I don't know if this will work
 	USART_SendData(USART2, (ch & (uint16_t)0x01FF));
 	/* Loop until transmit data register is empty *///this should work
 	while( !(USART2->ISR & 0x00000040) );

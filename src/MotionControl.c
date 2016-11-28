@@ -14,8 +14,6 @@
 #include "stm32f0xx.h"
 #include <string.h>
 #include "MotionControl.h"
-#include "motor.h"
-#include "delay.h"
 
 //this is the global variable that keeps track of the motor position.
 int MOTOR_POSITION;
@@ -90,276 +88,78 @@ void sense_motion(){
 	//West Sensor: 4
 
 	//define each sensor from the inputs from their respective pins
+	uint8_t instruction[6];
+
 	int northSensor = ((GPIOB -> IDR)>>4)&1;
 	int eastSensor = ((GPIOB -> IDR)>>5)&1;
 	int southSensor = ((GPIOB -> IDR)>>6)&1;
     int westSensor = ((GPIOB -> IDR)>>7)&1;
     GPIOC->ODR ^=(1<<9);//toggle the light for testing purposes.
 
+	instruction[0] = (char)2;
+	instruction[1] = (char)0xff;
+	instruction[2] = (char)0xff;
+	instruction[3] = (char)0xff;
+	instruction[4] = (char)0x02;
+	instruction[5] = '\0';
+
+	if(northSensor && eastSensor && southSensor && westSensor)
+		return;
+
+	//If a legitimate threat was found while scanning set sentry mode to false so it is no longer called.
+	is_in_ScanningMode = 0;
     if(northSensor && eastSensor){
-    	if(MOTOR_POSITION==NORTH){
-    		move_motor(1600,0);
-
-
-    	}
-    	else if(MOTOR_POSITION == NORTH_EAST){
-    		//do nothing
-    	}
-    	else if(MOTOR_POSITION==EAST){
-    		move_motor(1600,1);//move it counter clock wise
-    	}
-    	else if(MOTOR_POSITION==SOUTH_EAST){
-    		move_motor(3200,1);//move the motor 400 steps counter clockwise
-    	}
-    	else if(MOTOR_POSITION==SOUTH){
-    		move_motor(4800,1);
-    	}
-    	else if(MOTOR_POSITION==SOUTH_WEST)
-    		move_motor(6400,0);
-    	else if(MOTOR_POSITION==WEST){
-    		move_motor(4800,0);
-    	}
-    	else if(MOTOR_POSITION==NORTH_WEST)
-    		move_motor(3200,0);
-
-
+    	go_to_quadrant(7);
     	MOTOR_POSITION=NORTH_EAST;
-
-
+    	set_STM_cotrolled(0);
+    	UART_PutStr(instruction);
     }
     else if(eastSensor && southSensor){
-
-    			if(MOTOR_POSITION==NORTH){
-    	    		move_motor(4800,1);
-
-
-    	    	}
-    	    	else if(MOTOR_POSITION == NORTH_EAST){
-    	    		move_motor(3200,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==EAST){
-    	    		move_motor(1600,1);//move it counter clock wise
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH_EAST){
-    	    		//do nothing
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH){
-    	    		move_motor(1600,0);
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH_WEST)
-    	    		move_motor(3200,0);
-    	    	else if(MOTOR_POSITION==WEST){
-    	    		move_motor(4800,0);
-    	    	}
-    	    	else if(MOTOR_POSITION==NORTH_WEST)
-    	    		move_motor(6400,1);
-
-    		MOTOR_POSITION=SOUTH_EAST;
-
+		go_to_quadrant(5);
+		MOTOR_POSITION=SOUTH_EAST;
+		set_STM_cotrolled(0);
+		UART_PutStr(instruction);
     }
     else if(westSensor && southSensor){
-
-    			if(MOTOR_POSITION==NORTH){
-    	    		move_motor(600,0);
-
-
-    	    	}
-    	    	else if(MOTOR_POSITION == NORTH_EAST){
-    	    		move_motor(6400,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==EAST){
-    	    		move_motor(4800,1);//move it counter clock wise
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH_EAST){
-    	    		move_motor(3200,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH){
-    	    		move_motor(1600,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH_WEST){
-    	    		//move_motor(400,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==WEST){
-    	    		move_motor(1600,0);
-    	    	}
-    	    	else if(MOTOR_POSITION==NORTH_WEST)
-    	    		move_motor(3200,0);
-
-    		MOTOR_POSITION=SOUTH_WEST;
-
+		go_to_quadrant(3);
+		MOTOR_POSITION=SOUTH_WEST;
+		set_STM_cotrolled(0);
+		UART_PutStr(instruction);
     }
     else if(westSensor && northSensor){
-
-    			if(MOTOR_POSITION==NORTH){
-    	    		move_motor(1600,0);
-
-
-    	    	}
-    	    	else if(MOTOR_POSITION == NORTH_EAST){
-    	    		move_motor(3200,0);
-    	    	}
-    	    	else if(MOTOR_POSITION==EAST){
-    	    		move_motor(4800,0);//move it counter clock wise
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH_EAST){
-    	    		move_motor(6400,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH){
-    	    		move_motor(4800,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH_WEST){
-    	    		//move_motor(400,1);
-    	    		move_motor(3200,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==WEST){
-    	    		move_motor(1600,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==NORTH_WEST){
-    	    		//do nothing.
-    	    	}
-
-    		MOTOR_POSITION= NORTH_WEST;
-
+    	go_to_quadrant(1);
+		MOTOR_POSITION= NORTH_WEST;
+		set_STM_cotrolled(0);
+		UART_PutStr(instruction);
     }
     else if( northSensor){
-
-    			if(MOTOR_POSITION==NORTH){
-    	    		//move_motor(200,1);
-
-
-    	    	}
-    	    	else if(MOTOR_POSITION == NORTH_EAST){
-    	    		move_motor(1600,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==EAST){
-    	    		move_motor(3200,1);//move it counter clock wise
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH_EAST){
-    	    		move_motor(4800,1);
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH){
-    	    		move_motor(6400,0);
-    	    	}
-    	    	else if(MOTOR_POSITION==SOUTH_WEST){
-    	    		//move_motor(400,1);
-    	    		move_motor(4800,0);
-    	    	}
-    	    	else if(MOTOR_POSITION==WEST){
-    	    		move_motor(6400,0);
-    	    	}
-    	    	else if(MOTOR_POSITION==NORTH_WEST){
-    	    		//do nothing.
-    	    		move_motor(1600,0);
-    	    	}
-
-    		MOTOR_POSITION= NORTH;
-
+		go_to_quadrant(0);
+		MOTOR_POSITION= NORTH;
+		set_STM_cotrolled(0);
+		UART_PutStr(instruction);
     }
     else if( eastSensor){
-
-       			if(MOTOR_POSITION==NORTH){
-       	    		move_motor(3200,0);
-
-
-       	    	}
-       	    	else if(MOTOR_POSITION == NORTH_EAST){
-       	    		move_motor(1600,0);
-       	    	}
-       	    	else if(MOTOR_POSITION==EAST){
-       	    		//do nothing
-       	    	}
-       	    	else if(MOTOR_POSITION==SOUTH_EAST){
-       	    		move_motor(1600,1);
-       	    	}
-       	    	else if(MOTOR_POSITION==SOUTH){
-       	    		move_motor(3200,1);
-       	    	}
-       	    	else if(MOTOR_POSITION==SOUTH_WEST){
-       	    		//move_motor(400,1);
-       	    		move_motor(4800,1);
-       	    	}
-       	    	else if(MOTOR_POSITION==WEST){
-       	    		move_motor(6400,0);
-       	    	}
-       	    	else if(MOTOR_POSITION==NORTH_WEST){
-       	    		//do nothing.
-       	    		move_motor(4800,0);
-       	    	}
-
-       		MOTOR_POSITION= EAST;
-
-       }
-
+		go_to_quadrant(6);
+		MOTOR_POSITION= EAST;
+		set_STM_cotrolled(0);
+		UART_PutStr(instruction);
+    }
     else if( southSensor){
+		go_to_quadrant(4);
+		MOTOR_POSITION= SOUTH;
+		set_STM_cotrolled(0);
+		UART_PutStr(instruction);
 
-       			if(MOTOR_POSITION==NORTH){
-       	    		move_motor(6400,0);
-
-
-       	    	}
-       	    	else if(MOTOR_POSITION == NORTH_EAST){
-       	    		move_motor(4800,0);
-       	    	}
-       	    	else if(MOTOR_POSITION==EAST){
-       	    		move_motor(3200,0);//move it counter clock wise
-       	    	}
-       	    	else if(MOTOR_POSITION==SOUTH_EAST){
-       	    		move_motor(1600,0);
-       	    	}
-       	    	else if(MOTOR_POSITION==SOUTH){
-       	    		//move_motor(400,1);
-       	    	}
-       	    	else if(MOTOR_POSITION==SOUTH_WEST){
-
-       	    		move_motor(1600,1);
-       	    	}
-       	    	else if(MOTOR_POSITION==WEST){
-       	    		move_motor(3200,1);
-       	    	}
-       	    	else if(MOTOR_POSITION==NORTH_WEST){
-       	    		//do nothing.
-       	    		move_motor(4800,1);
-       	    	}
-
-       		MOTOR_POSITION= SOUTH;
-
-       }
+     }
     else if( westSensor){
+		go_to_quadrant(2);
+		MOTOR_POSITION= WEST;
+		set_STM_cotrolled(0);
+		UART_PutStr(instruction);
 
-       			if(MOTOR_POSITION==NORTH){
-       	    		move_motor(3200,1);
 
+    }
 
-       	    	}
-       	    	else if(MOTOR_POSITION == NORTH_EAST){
-       	    		move_motor(4800,1);
-       	    	}
-       	    	else if(MOTOR_POSITION==EAST){
-       	    		move_motor(6400,0);//move it counter clock wise
-       	    	}
-       	    	else if(MOTOR_POSITION==SOUTH_EAST){
-       	    		move_motor(4800,0);
-       	    	}
-       	    	else if(MOTOR_POSITION==SOUTH){
-       	    		move_motor(3200,0);
-       	    	}
-       	    	else if(MOTOR_POSITION==SOUTH_WEST){
-
-       	    		move_motor(1600,0);
-       	    	}
-       	    	else if(MOTOR_POSITION==WEST){
-       	    		//move_motor(400,1);
-       	    	}
-       	    	else if(MOTOR_POSITION==NORTH_WEST){
-       	    		//do nothing.
-       	    		move_motor(1600,1);
-       	    	}
-
-       		MOTOR_POSITION= WEST;
-
-       }
-
-   // delay_ms(3000);
 
 }
 //resets the motor to the north position based upon whatever postion it was in last
@@ -367,34 +167,7 @@ void sense_motion(){
 //need to work on it.
 void motor_reset(){
 
-			if(MOTOR_POSITION==NORTH){
-				//move_motor(200,1);
-
-
-			}
-			else if(MOTOR_POSITION == NORTH_EAST){
-				move_motor(200,1);
-			}
-			else if(MOTOR_POSITION==EAST){
-				move_motor(400,1);//move it counter clock wise
-			}
-			else if(MOTOR_POSITION==SOUTH_EAST){
-				move_motor(600,1);
-			}
-			else if(MOTOR_POSITION==SOUTH){
-				move_motor(800,0);
-			}
-			else if(MOTOR_POSITION==SOUTH_WEST){
-				//move_motor(400,1);
-				move_motor(600,0);
-			}
-			else if(MOTOR_POSITION==WEST){
-				move_motor(400,0);
-			}
-			else if(MOTOR_POSITION==NORTH_WEST){
-				//do nothing.
-				move_motor(200,0);
-			}
+		go_to_quadrant(0);
 
 		MOTOR_POSITION= NORTH;
 

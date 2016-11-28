@@ -103,16 +103,11 @@ int main(int argc, char* argv[]) {
     UART_Init(115200);						// Initialize the UART communication for the motor and other stuff in the future.
     while (1) {
 
-
-
-//    	if(isArmed == 1){
-//    		if(is_stm_controlled){
-//				sense_motion();
-//				delay_ms(1000);
-//    		}
-//    	}
-
-
+    	if(isArmed == 1){
+    		if(is_in_ScanningMode){ //WILL this right here is bad because owenership is  constantly changing
+				sense_motion();
+    		}
+    	}
 
         GPIOC->ODR ^= GPIO_ODR_8;           // Toggle blue LED (heartbeat)
         //encoder_count = TIM2->CNT;

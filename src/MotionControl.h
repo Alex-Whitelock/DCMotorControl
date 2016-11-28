@@ -10,6 +10,10 @@
 
 #include "stm32f0xx.h"
 #include <stdlib.h>
+#include "MotorCommunication.h"
+#include "motor.h"
+#include "delay.h"
+
 
 void motion_init();
 //void move_motor(int steps,int direction);

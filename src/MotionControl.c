@@ -107,7 +107,7 @@ void sense_motion(){
 		return;
 
 	//If a legitimate threat was found while scanning set sentry mode to false so it is no longer called.
-	is_in_ScanningMode = 0
+	is_in_ScanningMode = 0;
     if(northSensor && eastSensor){
     	go_to_quadrant(7);
     	MOTOR_POSITION=NORTH_EAST;

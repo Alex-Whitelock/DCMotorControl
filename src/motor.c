@@ -206,6 +206,7 @@ void pi_move_motor(int16_t encoder_ticks, uint8_t _speed, uint8_t _dir){
 				}
 			}
 		}
+	target_rpm = 0;
 
 
 	apply_electronic_break();

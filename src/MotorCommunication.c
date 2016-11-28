@@ -217,9 +217,20 @@ void USART2_IRQHandler(void)
 					encoder_ticks = (encoder_ticks_high << 8) | encoder_ticks_low;
 					direction = UART_rx_buffer[4] & 0x1;
 					motor_speed = UART_rx_buffer[3] & 0xff;
+					pi_move_motor(encoder_ticks, motor_speed, direction);
     			}
 
-				pi_move_motor(encoder_ticks, motor_speed, direction);
+
+
+				instruction[0] = 2;
+				instruction[1] = 0xff;
+				instruction[2] = 0xff;
+				instruction[3] = 0xff;
+				instruction[4] = 0x02;
+				instruction[5] = '\0';
+
+				UART_PutStr(instruction); // Put the strin
+
     		}
     	} else {
     		//no-op

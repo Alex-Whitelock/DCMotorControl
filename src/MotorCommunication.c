@@ -93,8 +93,8 @@ void USART2_IRQHandler(void)
 
     //Once we get to this part we need to decide which kind of instruction we are doing.
     if(UART_rx_counter == 4){
-
     	GPIOC->ODR ^= GPIO_ODR_9;
+
     	if(UART_rx_buffer[0] == 1){
     		//ask for PIR information.
     		pir_information = get_pir_information();
@@ -232,6 +232,16 @@ void USART2_IRQHandler(void)
 				UART_PutStr(instruction); // Put the strin
 
     		}
+
+    	} else if(UART_rx_buffer[0] == 9) {
+    		//turn on scanning mode.
+
+    		if(UART_rx_buffer[1] == 1){
+    			is_in_ScanningMode = 1;
+
+    		} else
+    			is_in_ScanningMode = 0;
+
     	} else {
     		//no-op
     	}

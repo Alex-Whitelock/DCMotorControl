@@ -68,7 +68,7 @@ uint8_t get_pir_information(){
 	int southSensor = ((GPIOB -> IDR)>>6)&1;
 	int westSensor = ((GPIOB -> IDR)>>7)&1;
 
-	uint8_t pirInformation =0;
+	uint8_t pirInformation = 0;
 	pirInformation = pirInformation | northSensor;
 	pirInformation = (pirInformation << 1) | eastSensor;
 	pirInformation = (pirInformation << 1) | southSensor;

@@ -81,6 +81,7 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 	halved_ticks = 0;
 
 
+
 	overshot = 0;
 	while(!overshot){
 
@@ -98,7 +99,7 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 				}
 			}
 
-			if(motor_ticks >= (encoder_ticks)){
+			if(motor_ticks >= ((int16_t)(.9 * encoder_ticks))){
 				overshot = 1;
 			}
 		}
@@ -117,7 +118,7 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 					}
 				}
 
-			if((~(motor_ticks)+1) >= encoder_ticks){
+			if((~(motor_ticks)+1) >= ((int16_t)(.9 * encoder_ticks))){
 				overshot = 1;
 			}
 
@@ -127,44 +128,44 @@ void move_motor(int16_t encoder_ticks, uint8_t _dir){
 
 	target_rpm = 0;
 	apply_electronic_break();
-	delay_ms(500);//wait a second.
-		if(dir == 0){
-				dir = 1;
-				GPIOC->ODR &= ~(1 << 11);  // Set PA4 to low
-				delay_ms(1);
-				GPIOC->ODR |= (1 << 12);
-				target_rpm = 5;
-
-			}
-			else{
-				dir = 0;
-				//Set PA4 to high
-				GPIOC->ODR |= (1 << 11);
-				delay_ms(1);
-				GPIOC->ODR &= ~(1 << 12);
-				// Set PA5 to low
-				target_rpm = 5;
-			}
-
-		overshot = 0;
-		while(overshot != 1){
-			if(dir == 1){
-				if(motor_ticks <= (encoder_ticks)){
-						overshot = 1;
-					}
-			}
-			else{
-
-				if((~(motor_ticks)+1) <= encoder_ticks){
-								overshot = 1;
-				}
-			}
-
-		}
-
-	motor_ticks = 0;
-	target_rpm = 0;
-	apply_electronic_break();
+//	delay_ms(500);//wait a second.
+//		if(dir == 0){
+//				dir = 1;
+//				GPIOC->ODR &= ~(1 << 11);  // Set PA4 to low
+//				delay_ms(1);
+//				GPIOC->ODR |= (1 << 12);
+//				target_rpm = 5;
+//
+//			}
+//			else{
+//				dir = 0;
+//				//Set PA4 to high
+//				GPIOC->ODR |= (1 << 11);
+//				delay_ms(1);
+//				GPIOC->ODR &= ~(1 << 12);
+//				// Set PA5 to low
+//				target_rpm = 5;
+//			}
+//
+//		overshot = 0;
+//		while(overshot != 1){
+//			if(dir == 1){
+//				if(motor_ticks <= (encoder_ticks)){
+//						overshot = 1;
+//					}
+//			}
+//			else{
+//
+//				if((~(motor_ticks)+1) <= encoder_ticks){
+//								overshot = 1;
+//				}
+//			}
+//
+//		}
+//
+//	motor_ticks = 0;
+//	target_rpm = 0;
+//	apply_electronic_break();
 
 }
 

@@ -46,6 +46,7 @@ void UART_Init(uint32_t speed){
 	GPIOA-> MODER |= 1<<31;//ENABLE PA15 for alternate function mode.
 
 	GPIOA->PUPDR |= (2<<28); //set pa14 into pull down mode so pi doesn't get random interupts.
+	GPIOA->PUPDR |= (2<<30); // set pa15 in
 
 	//GPIOA->AFR[0] |= (1<<8);//choose AF1 for pin 2
 	//GPIOA ->AFR[0] |= (1<<12);//choose af1 for pin 3
@@ -57,18 +58,30 @@ void UART_Init(uint32_t speed){
 	//send a clock to the usart register
 
 	USART2->CR1|=1<<5;
-	USART2->CR1|=USART_CR1_RE;//reciever enable
-	USART2->CR1|=USART_CR1_TE;//transmitter enable
-	USART2->CR1|=USART_CR1_UE;//usart enable
+	USART2->CR1 &= ~USART_CR1_RE;//reciever disable
+	USART2->CR1 &= ~USART_CR1_TE;//transmitter diable
+	//USART2->CR1|=USART_CR1_UE;//usart enable
 
 	USART2->BRR = SystemCoreClock/speed;
 
-	NVIC_EnableIRQ(USART2_IRQn);
-	NVIC_SetPriority(USART2_IRQn, priorityLevel); // Set to medium priority
+	//USART2->CR1 &= ~(1<<2);
+
+//	NVIC_EnableIRQ(USART2_IRQn);
+//	NVIC_SetPriority(USART2_IRQn, priorityLevel); // Set to medium priority
 	//isArmed=0;
 	//is_stm_controlled = 1; //When the stm board is turned on the initial stm control should be turned on.
 
 	}
+
+void activate_USART(void){
+	USART2->CR1 |= USART_CR1_RE; //rx enable
+	USART2->CR1 |= USART_CR1_TE; //tx enable
+	USART2->CR1|=USART_CR1_UE;//usart enable
+	NVIC_EnableIRQ(USART2_IRQn);
+	NVIC_SetPriority(USART2_IRQn,priorityLevel);
+
+
+}
 
 //This is the interupt handler for the USART
 void USART2_IRQHandler(void)
@@ -104,7 +117,7 @@ void USART2_IRQHandler(void)
     		instruction[0] = 1;
 
     		if(pir_information == 0){
-    			pir_information = 0xff;
+    			pir_information = 0xf0;
     			instruction[1] = pir_information;
     		} else
     			instruction[1] = pir_information;

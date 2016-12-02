@@ -29,6 +29,7 @@ uint8_t UART_SetName(char *name);
 uint8_t UART_SetPin(char *pin);
 void UART_Delay(uint32_t delay);
 void set_STM_cotrolled(uint8_t set);
+void activate_USART(void);
 
 
 

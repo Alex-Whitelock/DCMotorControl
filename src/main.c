@@ -89,7 +89,9 @@ volatile uint32_t encoder_count = 0;
 
 int main(int argc, char* argv[]) {
 
-    debouncer = 0;                          // Initialize global variables
+    debouncer = 0;     // Initialize global variables
+
+    volatile int waitingInit1 = 1;
 
     delay_init();                           // Initialize delay system
     LED_init();                             // Initialize LED's
@@ -99,12 +101,31 @@ int main(int argc, char* argv[]) {
 
 
 
-    motor_init();                           // Initialize motor code
-    UART_Init(115200);						// Initialize the UART communication for the motor and other stuff in the future.
+    motor_init(); // Initialize motor code
+    GPIOB->MODER &= ~(3<<6); // put pb3 into general purpose input mode
+    GPIOB->PUPDR |= (2<<6); // put this in pull down
+    UART_Init(115200);	// Initialize the UART communication for the motor and other stuff in the future.
+
+    delay_ms(15000);
+
+    while(waitingInit1){
+    	if(((GPIOB->IDR) >> 3 ) & 1) {
+    		// If the idr for gpiob7 is on then we need to activate the uart.
+    		activate_USART();
+    		waitingInit1 = 0;
+    		//now we can enter into the main loop.
+
+    	}
+    }
+	//TODO: Slot encoder find north.
+
     while (1) {
 
+
+
+
     	if(isArmed == 1){
-    		if(is_in_ScanningMode){ //WILL this right here is bad because owenership is  constantly changing
+    		if(is_in_ScanningMode){
 				sense_motion();
     		}
     	}

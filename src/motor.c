@@ -21,6 +21,10 @@ void motor_init(void) {
     pwm_init();
     encoder_init();
     ADC_init();
+    RCC->AHBENR |= RCC_AHBENR_GPIODEN;
+    GPIOD->MODER &= ~(3<<2); //genearl purpose input mode for pd2
+    GPIOD->PUPDR |= (1<<2); // put it into pull-up mode since encoder is active high.
+
 }
 
 //under no circumstances change the direction of the motor while it is moving.
@@ -292,23 +296,23 @@ void pwm_setDutyCycle(uint8_t duty) {
 
 void calibrate(){
 
-	volatile uint8_t slot= (GPIOA->ODR >> 10) & 0x1;
-
-	if(slot){
+	if(((GPIOD->IDR >> 2) & 0X1)==0){
+		GPIOC->ODR ^= GPIO_ODR_8;
 		gear_position = 0;
-	} else {
-		if(gear_position < 6400) {
-			motor_go(10, 1);
-		} else {
-			motor_go(10, 0);
-		}
-		while(!slot){
-			slot = (GPIOA->ODR >> 10) & 0x1;
-		}
+		return ;
+	}
+	volatile uint8_t findingNorth = 1;
 
-		motor_stop();
-		gear_position = 0;
+	motor_go(20,0); // Start the motor moving at 10 rpm
+	while(findingNorth) {
 
+		if(((GPIOD->IDR >> 2) & 0X1)==0){
+			motor_stop();
+			findingNorth  = 0;
+			gear_position = 0;
+			 GPIOC->ODR ^= GPIO_ODR_8;
+
+		}
 	}
 
 

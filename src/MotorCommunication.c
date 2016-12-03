@@ -164,6 +164,8 @@ void USART2_IRQHandler(void)
     		instruction[3] = 0xff;
     		instruction[4] = 0x02;
     		instruction[5] = '\0';
+
+
     		//tell the stm that the last value is 0 not 255 doesn't really matter for this instruction though
 
     		//This tell the pi that it now has control of the motor again.
@@ -195,7 +197,7 @@ void USART2_IRQHandler(void)
     		//reset method goes here.
     		if(is_stm_controlled == 0){
     			if(UART_rx_buffer[2] == 1){
-    				reset_motor();
+    				calibrate();
     			} else if(UART_rx_buffer[2] == 0){
     				quadrant = UART_rx_buffer[1] & 0xff;
     				go_to_quadrant(quadrant);

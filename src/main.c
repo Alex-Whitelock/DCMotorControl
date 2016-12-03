@@ -98,19 +98,22 @@ int main(int argc, char* argv[]) {
     button_init();                          // Initialize button
     SysTick_setCallback(&debounce_button);  // Register callback to debounce and manage button
     motion_init();
-
+    UART_Init(115200);
 
 
     motor_init(); // Initialize motor code
     GPIOB->MODER &= ~(3<<6); // put pb3 into general purpose input mode
     GPIOB->PUPDR |= (2<<6); // put this in pull down
-    UART_Init(115200);	// Initialize the UART communication for the motor and other stuff in the future.
+    	// Initialize the UART communication for the motor and other stuff in the future.
+
+    calibrate();
 
     delay_ms(15000);
 
     while(waitingInit1){
     	if(((GPIOB->IDR) >> 3 ) & 1) {
     		// If the idr for gpiob7 is on then we need to activate the uart.
+
     		activate_USART();
     		waitingInit1 = 0;
     		//now we can enter into the main loop.

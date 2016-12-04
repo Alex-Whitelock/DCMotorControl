@@ -30,6 +30,11 @@ void motor_init(void) {
 //under no circumstances change the direction of the motor while it is moving.
 void motor_go(uint8_t _target_rpm, uint8_t _dir) {
 
+	if((_dir != dir) && (target_rpm != 0) ){
+		return;
+	}
+
+
 	if(_dir == 0){
 			GPIOC->ODR |= (1 << 11);  // Set PA4 to high
 			GPIOC->ODR &= ~(1 << 12); // Set PA5 to low

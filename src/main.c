@@ -116,13 +116,14 @@ int main(int argc, char* argv[]) {
 	instruction[5] = '\0';
 
     calibrate();
+    GPIOC->ODR ^= GPIO_ODR_9;
 
     delay_ms(15000);
     //This is to wait for the activation pin.
     while(waitingInit1){
     	if(((GPIOB->IDR) >> 3 ) & 1) {
     		// If the idr for gpiob7 is on then we need to activate the uart.
-
+    		GPIOC->ODR ^= GPIO_ODR_9;
     		activate_USART();
     		waitingInit1 = 0;
     		//now we can enter into the main loop.
@@ -140,10 +141,10 @@ int main(int argc, char* argv[]) {
 
     	if(shouldSendControl) {
     		UART_PutStr(instruction);
-    		 GPIOC->ODR ^= GPIO_ODR_8;
+
     	}
 
-//        GPIOC->ODR ^= GPIO_ODR_8;           // Toggle blue LED (heartbeat)
+        GPIOC->ODR ^= GPIO_ODR_8;           // Toggle blue LED (heartbeat)
         delay_ms(128);                      // Delay 1/8 second
     }
 }

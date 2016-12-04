@@ -88,7 +88,6 @@ void sense_motion(){
 	//West Sensor: 4
 
 	//define each sensor from the inputs from their respective pins
-	uint8_t instruction[6];
 
 	int northSensor = ((GPIOB -> IDR)>>4)&1;
 	int eastSensor = ((GPIOB -> IDR)>>5)&1;
@@ -96,14 +95,10 @@ void sense_motion(){
     int westSensor = ((GPIOB -> IDR)>>7)&1;
     GPIOC->ODR ^=(1<<9);//toggle the light for testing purposes.
 
-	instruction[0] = (char)2;
-	instruction[1] = (char)0xff;
-	instruction[2] = (char)0xff;
-	instruction[3] = (char)0xff;
-	instruction[4] = (char)0x02;
-	instruction[5] = '\0';
-
 	if(northSensor && eastSensor && southSensor && westSensor)
+		return;
+
+	if((!northSensor) && (!eastSensor) && (!southSensor) && (!westSensor))
 		return;
 
 	//If a legitimate threat was found while scanning set sentry mode to false so it is no longer called.
@@ -112,53 +107,46 @@ void sense_motion(){
     	go_to_quadrant(7);
     	MOTOR_POSITION=NORTH_EAST;
     	set_STM_cotrolled(0);
-    	UART_PutStr(instruction);
     }
     else if(eastSensor && southSensor){
 		go_to_quadrant(5);
 		MOTOR_POSITION=SOUTH_EAST;
 		set_STM_cotrolled(0);
-		UART_PutStr(instruction);
     }
     else if(westSensor && southSensor){
 		go_to_quadrant(3);
 		MOTOR_POSITION=SOUTH_WEST;
 		set_STM_cotrolled(0);
-		UART_PutStr(instruction);
     }
     else if(westSensor && northSensor){
     	go_to_quadrant(1);
 		MOTOR_POSITION= NORTH_WEST;
 		set_STM_cotrolled(0);
-		UART_PutStr(instruction);
     }
     else if( northSensor){
 		go_to_quadrant(0);
 		MOTOR_POSITION= NORTH;
 		set_STM_cotrolled(0);
-		UART_PutStr(instruction);
     }
     else if( eastSensor){
 		go_to_quadrant(6);
 		MOTOR_POSITION= EAST;
 		set_STM_cotrolled(0);
-		UART_PutStr(instruction);
     }
     else if( southSensor){
 		go_to_quadrant(4);
 		MOTOR_POSITION= SOUTH;
 		set_STM_cotrolled(0);
-		UART_PutStr(instruction);
 
      }
     else if( westSensor){
 		go_to_quadrant(2);
 		MOTOR_POSITION= WEST;
 		set_STM_cotrolled(0);
-		UART_PutStr(instruction);
-
 
     }
+
+    shouldSendControl = 1;
 
 
 }

@@ -19,6 +19,7 @@ void UART_Init(uint32_t speed);
 volatile int isArmed;
 volatile int is_stm_controlled;
 volatile int is_in_ScanningMode;
+volatile int shouldSendControl;
 void UART_PutChar(unsigned char c);
 void UART_PutStr(char *str);
 void UART_ClearRxBuffer(void);

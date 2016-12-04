@@ -31,7 +31,8 @@ void UART_Init(uint32_t speed){
 	*/
 	isArmed = 0;
 	is_stm_controlled = 0;
-	is_in_ScanningMode = 1;//Start in scanning mode.
+	is_in_ScanningMode = 0;
+	shouldSendControl = 0;
 
 	RCC->AHBENR|=RCC_AHBENR_GPIOAEN;
 	RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
@@ -99,6 +100,8 @@ void USART2_IRQHandler(void)
 
 	NVIC_DisableIRQ(USART2_IRQn);
 
+
+
   if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
   {
 		/* Read one byte from the receive data register */
@@ -107,6 +110,7 @@ void USART2_IRQHandler(void)
     //Once we get to this part we need to decide which kind of instruction we are doing.
     if(UART_rx_counter == 4){
     	GPIOC->ODR ^= GPIO_ODR_9;
+
 
     	if(UART_rx_buffer[0] == 1){
     		//ask for PIR information.
@@ -143,7 +147,9 @@ void USART2_IRQHandler(void)
     		//pir sensors.
     		isArmed = 0;
     		is_stm_controlled = 0;//make it so that the stm is not controlled.
+    		shouldSendControl = 0;
     		set_STM_cotrolled(0);
+
     		//UART_PutStr("Hello from 2\0");
 
     	} else if(UART_rx_buffer[0] == 3) {
@@ -156,20 +162,20 @@ void USART2_IRQHandler(void)
     			direction = UART_rx_buffer[3];
 
     			move_motor(encoder_ticks, direction);
+
+
+        		shouldSendControl = 1;
+
+        		//UART_PutStr(instruction);
     		}
 
-    		instruction[0] = 2;
-    		instruction[1] = 0xff;
-    		instruction[2] = 0xff;
-    		instruction[3] = 0xff;
-    		instruction[4] = 0x02;
-    		instruction[5] = '\0';
+
 
 
     		//tell the stm that the last value is 0 not 255 doesn't really matter for this instruction though
 
     		//This tell the pi that it now has control of the motor again.
-    		UART_PutStr(instruction);
+
 
     		//UART_PutStr("Hello from 3\0");
 
@@ -177,6 +183,7 @@ void USART2_IRQHandler(void)
     		//transfer total control from pi to stm.
 
     		set_STM_cotrolled(1);
+    		is_in_ScanningMode = 1;
 
     		//UART_PutStr("Hello from 4\0");
     	} else if(UART_rx_buffer[0] == 5) {
@@ -198,23 +205,20 @@ void USART2_IRQHandler(void)
     		if(is_stm_controlled == 0){
     			if(UART_rx_buffer[2] == 1){
     				calibrate();
+    				shouldSendControl = 1;
     			} else if(UART_rx_buffer[2] == 0){
     				quadrant = UART_rx_buffer[1] & 0xff;
     				go_to_quadrant(quadrant);
+    				shouldSendControl = 1;
 
     			} else{
     				//no-op
+
     			}
 
-    			instruction[0] = 2;
-				instruction[1] = 0xff;
-				instruction[2] = 0xff;
-				instruction[3] = 0xff;
-				instruction[4] = 0x02;
-				instruction[5] = '\0';
 
 
-				UART_PutStr(instruction); // Put the strin
+
 
     		}
     		//UART_PutStr("Hello from 6\0");
@@ -226,25 +230,19 @@ void USART2_IRQHandler(void)
     	} else if(UART_rx_buffer[0] == 8) {
     		if(is_stm_controlled == 0) {
 
-    			if(is_stm_controlled == 0){
-					encoder_ticks_high = UART_rx_buffer[1] & 0xff;
-					encoder_ticks_low = UART_rx_buffer[2] & 0xff;
-					encoder_ticks = (encoder_ticks_high << 8) | encoder_ticks_low;
-					direction = UART_rx_buffer[4] & 0x1;
-					motor_speed = UART_rx_buffer[3] & 0xff;
-					pi_move_motor(encoder_ticks, motor_speed, direction);
-    			}
+
+				encoder_ticks_high = UART_rx_buffer[1] & 0xff;
+				encoder_ticks_low = UART_rx_buffer[2] & 0xff;
+				encoder_ticks = (encoder_ticks_high << 8) | encoder_ticks_low;
+				direction = UART_rx_buffer[4] & 0x1;
+				motor_speed = UART_rx_buffer[3] & 0xff;
+				pi_move_motor(encoder_ticks, motor_speed, direction);
 
 
 
-				instruction[0] = 2;
-				instruction[1] = 0xff;
-				instruction[2] = 0xff;
-				instruction[3] = 0xff;
-				instruction[4] = 0x02;
-				instruction[5] = '\0';
+    			shouldSendControl = 1;
 
-				UART_PutStr(instruction); // Put the strin
+
 
     		}
 
@@ -272,24 +270,11 @@ void USART2_IRQHandler(void)
     	UART_rx_counter ++;
     }
 
-    NVIC_EnableIRQ(USART2_IRQn);
-    NVIC_SetPriority(USART2_IRQn, priorityLevel);
+
+    	NVIC_EnableIRQ(USART2_IRQn);
+    	NVIC_SetPriority(USART2_IRQn,priorityLevel);
 
 
-		/* if the last character received is the LF ('\r' or 0x0a) character OR if the UART_RX_BUFFER_LENGTH (40) value has been reached ...*/
-//    if((UART_rx_counter + 1 == UART_RX_BUFFER_LENGTH) || (UART_rx_buffer[UART_rx_counter] == 0x0a))
-//    {
-//      new_UART_msg = 1;
-//			for(x=0; x <= UART_rx_counter; x++)											//copy each character in the UART_rx_buffer to the UART_msg variable
-//				UART_msg[x] = UART_rx_buffer[x];
-//			UART_msg[x-1] = '\0';																		//terminate with NULL character
-//      memset(UART_rx_buffer, 0, UART_RX_BUFFER_LENGTH);				//clear UART_rx_buffer
-//      UART_rx_counter = 0;
-//    }
-//    else
-//    {
-//			UART_rx_counter++;
-//    }
   }
 }
 
@@ -301,6 +286,10 @@ void set_STM_cotrolled(uint8_t set){
 		isArmed =0;
 		is_stm_controlled = 0;
 	}
+}
+
+void set_In_Scaning_Mode(void) {
+
 }
 
 //used to send a string of information

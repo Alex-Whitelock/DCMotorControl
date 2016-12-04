@@ -310,7 +310,7 @@ void calibrate(){
 			motor_stop();
 			findingNorth  = 0;
 			gear_position = 0;
-			 GPIOC->ODR ^= GPIO_ODR_8;
+//			 GPIOC->ODR ^= GPIO_ODR_8;
 
 		}
 	}
